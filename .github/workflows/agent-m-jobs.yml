@@ -1,0 +1,226 @@
+# Agent M's job workflow for this product, written by Agent M (docs/architecture/MOD-runtimes.md). It runs an entry of Agent M's
+# workflow entries for each event below, from a checkout of the instance at the commit named in each job. The secrets are named
+# here and never valued; they are set on the repository's secrets page. The agent works on a machine of its own, which receives
+# the key of the one participant the run names and no other secret, and keeps no token in its checkouts; where that machine can, a
+# model's run works there as the model's own user, beside the key holder; the person's token is read only by the job that writes.
+name: agent-m-jobs
+
+on:
+  push:
+    paths:
+      - "docs/jobs/**"
+      - "docs/gates/**"
+  pull_request:
+    types: [closed]
+  check_run:
+    types: [completed]
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+    inputs:
+      job:
+        description: "The identifier of the job to start"
+        required: true
+      task:
+        description: "The task a conversation handed over, in the participant's words; given to the job and written to no file"
+        required: false
+      endpoint:
+        description: "The kind, address and model of a model endpoint, as JSON text"
+        required: false
+      secret:
+        description: "The name of the CI secret that holds the key of that endpoint, a name this file reads below; never the key"
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  hosted-plan:
+    # Which agent's job runs: the one whose key the job names, among the keys this file reads. It holds no secret.
+    name: Agent M plans on hosted
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch))
+    runs-on: ubuntu-latest
+    outputs:
+      agent: ${{ steps.plan.outputs.agent }}
+    env:
+      AGENT_M_RUNNER: "hosted"
+      AGENT_M_PRODUCT_DIR: ${{ github.workspace }}/product
+      AGENT_M_KEY_NAMES: "NVIDIA_NEMOTRON_3_ULTRA_550B_A55B_API_KEY"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: product
+      - uses: actions/checkout@v4
+        with:
+          repository: akmaier/agent-m
+          ref: 946fe3584c146bb38344febaaf26515c753f4c83
+          path: instance
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - id: plan
+        working-directory: instance
+        run: node src/workflow-entries/main.mjs chooseAgentKey
+  hosted-agent-0:
+    # The agent's machine: the product and the instance read with the workflow's own read access, which neither checkout keeps; the one key of the participant the run
+    # names, no other secret; the model's user, as whom a model's run works where the machine can make that user (MOD-workflow-entries).
+    name: Agent M's agent on hosted, key 0
+    needs: hosted-plan
+    if: needs.hosted-plan.outputs.agent == '0'
+    runs-on: ubuntu-latest
+    outputs:
+      artifact: ${{ steps.result.outputs.artifact-id }}
+    env:
+      AGENT_M_RUNNER: "hosted"
+      AGENT_M_PART: "agent"
+      AGENT_M_PRODUCT_DIR: ${{ github.workspace }}/product
+      AGENT_M_RESULT_DIR: ${{ github.workspace }}/result
+      AGENT_M_MODEL_USER: "agent-m-model"
+      AGENT_M_KEY_NAMES: "NVIDIA_NEMOTRON_3_ULTRA_550B_A55B_API_KEY"
+      AGENT_M_KEY: "0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: product
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: akmaier/agent-m
+          ref: 946fe3584c146bb38344febaaf26515c753f4c83
+          path: instance
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      # The committer of what the job commits in its checkouts is the person who started the run — the run's actor, with GitHub's no-reply address.
+      - run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+      - if: github.event_name == 'push'
+        working-directory: instance
+        run: node src/workflow-entries/main.mjs onRecordsChanged
+      - if: github.event_name == 'workflow_dispatch'
+        working-directory: instance
+        run: node src/workflow-entries/main.mjs onDispatch
+      - if: always()
+        working-directory: instance
+        run: node src/workflow-entries/main.mjs leaveResult
+      - id: result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-m-result-hosted
+          path: ${{ github.workspace }}/result/out
+          retention-days: 1
+          if-no-files-found: ignore
+  hosted-agent-1:
+    # The agent's machine: the product and the instance read with the workflow's own read access, which neither checkout keeps; the one key of the participant the run
+    # names, no other secret; the model's user, as whom a model's run works where the machine can make that user (MOD-workflow-entries).
+    name: Agent M's agent on hosted, key 1
+    needs: hosted-plan
+    if: needs.hosted-plan.outputs.agent == '1'
+    runs-on: ubuntu-latest
+    outputs:
+      artifact: ${{ steps.result.outputs.artifact-id }}
+    env:
+      AGENT_M_RUNNER: "hosted"
+      AGENT_M_PART: "agent"
+      AGENT_M_PRODUCT_DIR: ${{ github.workspace }}/product
+      AGENT_M_RESULT_DIR: ${{ github.workspace }}/result
+      AGENT_M_MODEL_USER: "agent-m-model"
+      AGENT_M_KEY_NAMES: "NVIDIA_NEMOTRON_3_ULTRA_550B_A55B_API_KEY"
+      AGENT_M_KEY: "1"
+      NVIDIA_NEMOTRON_3_ULTRA_550B_A55B_API_KEY: ${{ secrets.NVIDIA_NEMOTRON_3_ULTRA_550B_A55B_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: product
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: akmaier/agent-m
+          ref: 946fe3584c146bb38344febaaf26515c753f4c83
+          path: instance
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      # The committer of what the job commits in its checkouts is the person who started the run — the run's actor, with GitHub's no-reply address.
+      - run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+      - if: github.event_name == 'push'
+        working-directory: instance
+        run: node src/workflow-entries/main.mjs onRecordsChanged
+      - if: github.event_name == 'workflow_dispatch'
+        working-directory: instance
+        run: node src/workflow-entries/main.mjs onDispatch
+      - if: always()
+        working-directory: instance
+        run: node src/workflow-entries/main.mjs leaveResult
+      - id: result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-m-result-hosted
+          path: ${{ github.workspace }}/result/out
+          retention-days: 1
+          if-no-files-found: ignore
+  hosted:
+    # The job that writes: it runs no agent, reads the person's token, and writes the agent's result once it has checked it.
+    name: Agent M jobs on hosted
+    needs: [hosted-plan, hosted-agent-0, hosted-agent-1]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    env:
+      AGENT_M_RUNNER: "hosted"
+      AGENT_M_PART: "write"
+      AGENT_M_PRODUCT_DIR: ${{ github.workspace }}/product
+      AGENT_M_RESULT_DIR: ${{ github.workspace }}/result
+      AGENT_M_TOKEN_NAME: "AGENT_M_TOKEN"
+      AGENT_M_KEY_NAMES: "NVIDIA_NEMOTRON_3_ULTRA_550B_A55B_API_KEY"
+      AGENT_M_TOKEN: ${{ secrets.AGENT_M_TOKEN }}
+      NVIDIA_NEMOTRON_3_ULTRA_550B_A55B_API_KEY: ${{ secrets.NVIDIA_NEMOTRON_3_ULTRA_550B_A55B_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.AGENT_M_TOKEN }}
+          path: product
+      - uses: actions/checkout@v4
+        with:
+          repository: akmaier/agent-m
+          ref: 946fe3584c146bb38344febaaf26515c753f4c83
+          token: ${{ secrets.AGENT_M_TOKEN }}
+          path: instance
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      # The committer of what the job writes is the person who started the run — the run's actor, with GitHub's no-reply address —, whose token pushes it.
+      - run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+      - if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch))
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: agent-m-result-hosted
+          path: ${{ github.workspace }}/result/out
+      - if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch))
+        working-directory: instance
+        run: node src/workflow-entries/main.mjs writeResult
+      - if: github.event_name == 'pull_request'
+        working-directory: instance
+        run: node src/workflow-entries/main.mjs onPullRequestClosed
+      - if: github.event_name == 'check_run'
+        working-directory: instance
+        run: node src/workflow-entries/main.mjs onCheckCompleted
+      - if: github.event_name == 'schedule'
+        working-directory: instance
+        run: node src/workflow-entries/main.mjs onSchedule
+      # The result is deleted from the server once it is written, or refused: while it is kept, whoever may read the repository's runs may download it.
+      - if: always()
+        run: |
+          for id in ${{ needs.hosted-agent-0.outputs.artifact }} ${{ needs.hosted-agent-1.outputs.artifact }}; do
+            curl --fail --silent --show-error -X DELETE -H "Authorization: Bearer $AGENT_M_TOKEN" -H "Accept: application/vnd.github+json" \
+              "${{ github.api_url }}/repos/${{ github.repository }}/actions/artifacts/$id"
+          done
