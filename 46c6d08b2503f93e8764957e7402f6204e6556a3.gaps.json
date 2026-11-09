@@ -1,0 +1,1 @@
+{"format":"agent-m-trace-gaps","version":1,"commit":"46c6d08b2503f93e8764957e7402f6204e6556a3","gaps":{"requirementsWithoutUseCase":["IMPLEMENTATION JAVASCRIPT WEB","KISS NO EXTRA FEATURES","YAGNI NO UNNECESSARY ABSTRACTION"],"requirementsWithoutModule":[],"requirementsWithoutTest":[],"useCasesWithoutRequirement":[],"unknownNames":[]}}
