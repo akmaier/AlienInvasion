@@ -1,0 +1,40 @@
+# Requirements: IMPLEMENTATION_JAVASCRIPT_WEB, GAMEPLAY_HORIZONTAL_MOVEMENT, GAMEPLAY_DESCENDING_MOVEMENT, PLAYER_MOVEMENT_KEYS, PLAYER_FIRE_SPACEBAR, PROJECTILE_TRAVEL, PROJECTILE_REMOVAL, ALIEN_DESTRUCTION, SCORE_INCREMENT, GAME_OVER_CONDITION, SCORE_DISPLAY, KISS_NO_EXTRA_FEATURES, YAGNI_NO_UNNECESSARY_ABSTRACTION, IMPLEMENTATION JAVASCRIPT WEB, GAMEPLAY HORIZONTAL MOVEMENT, GAMEPLAY DESCENDING MOVEMENT, PLAYER MOVEMENT KEYS, PLAYER FIRE SPACEBAR, PROJECTILE TRAVEL, PROJECTILE REMOVAL, ALIEN DESTRUCTION, SCORE INCREMENT, GAME OVER CONDITION, SCORE DISPLAY, KISS NO EXTRA FEATURES, YAGNI NO UNNECESSARY ABSTRACTION, SESSION HIGHSCORE DATA, SESSION HIGHSCORE LIMIT, SESSION HIGHSCORE DISPLAY GAMEOVER, SESSION HIGHSCORE DISPLAY INGAME, SESSION HIGHSCORE RESET
+
+**The change.** Withdrawn IMPLEMENTATION_JAVASCRIPT_WEB; withdrawn GAMEPLAY_HORIZONTAL_MOVEMENT; withdrawn GAMEPLAY_DESCENDING_MOVEMENT; withdrawn PLAYER_MOVEMENT_KEYS; withdrawn PLAYER_FIRE_SPACEBAR; withdrawn PROJECTILE_TRAVEL; withdrawn PROJECTILE_REMOVAL; withdrawn ALIEN_DESTRUCTION; withdrawn SCORE_INCREMENT; withdrawn GAME_OVER_CONDITION; withdrawn SCORE_DISPLAY; withdrawn KISS_NO_EXTRA_FEATURES; withdrawn YAGNI_NO_UNNECESSARY_ABSTRACTION; added IMPLEMENTATION JAVASCRIPT WEB; added GAMEPLAY HORIZONTAL MOVEMENT; added GAMEPLAY DESCENDING MOVEMENT; added PLAYER MOVEMENT KEYS; added PLAYER FIRE SPACEBAR; added PROJECTILE TRAVEL; added PROJECTILE REMOVAL; added ALIEN DESTRUCTION; added SCORE INCREMENT; added GAME OVER CONDITION; added SCORE DISPLAY; added KISS NO EXTRA FEATURES; added YAGNI NO UNNECESSARY ABSTRACTION; added SESSION HIGHSCORE DATA; added SESSION HIGHSCORE LIMIT; added SESSION HIGHSCORE DISPLAY GAMEOVER; added SESSION HIGHSCORE DISPLAY INGAME; added SESSION HIGHSCORE RESET; the rest of the section is as the person wrote it.
+
+**Why.** Made all 18 requirement sources concise with only github.com/akmaier; kept SESSION HIGHSCORE DATA as a single requirement describing one cohesive highscore entry structure; groups unchanged as they already assign all requirements to the nine specified categories.
+
+**Impact list.**
+- IMPLEMENTATION_JAVASCRIPT_WEB: withdrawn; nothing names it.
+- GAMEPLAY_HORIZONTAL_MOVEMENT: withdrawn; nothing names it.
+- GAMEPLAY_DESCENDING_MOVEMENT: withdrawn; nothing names it.
+- PLAYER_MOVEMENT_KEYS: withdrawn; nothing names it.
+- PLAYER_FIRE_SPACEBAR: withdrawn; nothing names it.
+- PROJECTILE_TRAVEL: withdrawn; nothing names it.
+- PROJECTILE_REMOVAL: withdrawn; nothing names it.
+- ALIEN_DESTRUCTION: withdrawn; nothing names it.
+- SCORE_INCREMENT: withdrawn; nothing names it.
+- GAME_OVER_CONDITION: withdrawn; nothing names it.
+- SCORE_DISPLAY: withdrawn; nothing names it.
+- KISS_NO_EXTRA_FEATURES: withdrawn; nothing names it.
+- YAGNI_NO_UNNECESSARY_ABSTRACTION: withdrawn; nothing names it.
+- IMPLEMENTATION JAVASCRIPT WEB: added; nothing names it.
+- GAMEPLAY HORIZONTAL MOVEMENT: added; nothing names it.
+- GAMEPLAY DESCENDING MOVEMENT: added; nothing names it.
+- PLAYER MOVEMENT KEYS: added; nothing names it.
+- PLAYER FIRE SPACEBAR: added; nothing names it.
+- PROJECTILE TRAVEL: added; nothing names it.
+- PROJECTILE REMOVAL: added; nothing names it.
+- ALIEN DESTRUCTION: added; nothing names it.
+- SCORE INCREMENT: added; nothing names it.
+- GAME OVER CONDITION: added; nothing names it.
+- SCORE DISPLAY: added; nothing names it.
+- KISS NO EXTRA FEATURES: added; nothing names it.
+- YAGNI NO UNNECESSARY ABSTRACTION: added; nothing names it.
+- SESSION HIGHSCORE DATA: added; nothing names it.
+- SESSION HIGHSCORE LIMIT: added; nothing names it.
+- SESSION HIGHSCORE DISPLAY GAMEOVER: added; nothing names it.
+- SESSION HIGHSCORE DISPLAY INGAME: added; nothing names it.
+- SESSION HIGHSCORE RESET: added; nothing names it.
+
+**Origin.** Source github.com/akmaier. Asked in a conversation in the prompt bar; saved by JOB-20261109-1159-e6d4.
