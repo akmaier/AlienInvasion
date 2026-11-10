@@ -5,7 +5,9 @@ folder: src/input
 realises:
   - PLAYER MOVEMENT KEYS
   - PLAYER FIRE SPACEBAR
+  - PLAYER SHIP SELECTION
   - UC-001
+  - UC-007
 follows:
   - ARC-001
 uses: []
@@ -22,11 +24,11 @@ Translate raw keyboard events into canonical game commands for the Game Logic La
 ## Parts
 
 - `KeyboardHandler` — Registers keydown/keyup listeners, tracks key state, emits `GameCommands` objects.
-- `GameCommands` — Immutable data structure representing the player's intent for a single frame: `{ left: boolean, right: boolean, fire: boolean }`.
+- `GameCommands` — Immutable data structure representing the player's intent for a single frame.
 
 ## Data
 
-- Current key state: Set of pressed keys (ArrowLeft, ArrowRight, KeyA, KeyD, Space).
+- Current key state: Set of pressed keys (ArrowLeft, ArrowRight, KeyA, KeyD, Space, Enter).
 - No persistent data; state resets each frame after emitting commands.
 
 ## Interfaces
@@ -35,13 +37,15 @@ Translate raw keyboard events into canonical game commands for the Game Logic La
 
 ```typescript
 interface GameCommands {
-  left: boolean;   // true when ArrowLeft or KeyA held
-  right: boolean;  // true when ArrowRight or KeyD held
-  fire: boolean;   // true on Space keydown (not hold)
+  left: boolean;           // true when ArrowLeft or KeyA held (movement or ship selection navigation)
+  right: boolean;          // true when ArrowRight or KeyD held (movement or ship selection navigation)
+  fire: boolean;           // true on Space keydown (not hold) - fires projectile in playing state
+  confirm: boolean;        // true on Enter/Space keydown (not hold) - confirms ship selection
+  highscoreToggle: boolean; // true on H keydown (edge) - toggles highscore overlay
 }
 ```
 
-The Game Logic Layer calls `getCommands(): GameCommands` each frame to retrieve the current intent.
+The Game Logic Layer calls `getCommands(): GameCommands` each frame to retrieve the current intent. **During ShipSelection phase, `left`/`right` navigate options and `confirm` selects the highlighted ship type. During Playing phase, `left`/`right` move the ship and `fire` shoots.**
 
 ## Files
 
@@ -65,6 +69,8 @@ classDiagram
         +left: boolean
         +right: boolean
         +fire: boolean
+        +confirm: boolean
+        +highscoreToggle: boolean
     }
     KeyboardHandler --> GameCommands: creates
 ```

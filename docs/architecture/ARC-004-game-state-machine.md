@@ -30,6 +30,7 @@ forced_by:
   - UC-005
   - UC-006
   - UC-007
+  - UC-008
 designs: []
 ---
 
@@ -44,28 +45,40 @@ The game has three primary states: **ShipSelection**, **Playing**, and **GameOve
 A **simple three-state machine** implemented as a string variable `gameState` with values `'shipselection'` | `'playing'` | `'gameover'`.
 
 - **ShipSelection state**:
-  - Game loop renders the ship selection screen
-  - Player chooses between available ship types (regular or slow)
+  - Game loop renders the ship selection screen showing all available ship types
+  - Player chooses between available ship types (regular or slow) using left/right navigation
+  - Regular ship option shows: standard speed, standard projectile
+  - Slow ship option shows: slower horizontal movement, special projectile destroying up to three aliens per shot
+  - Player confirms selection (Enter/Space); `initializeGame(selectedShipType)` called which:
+    - Sets up alien formation and ship position with the chosen ship type (regular or slow)
+    - Configures ship movement speed and projectile behavior per type
+    - Sets `gameState = 'playing'`
   - No game entities (aliens, projectiles) are active
-  - Input only accepts ship selection navigation and confirmation
+  - Input only accepts ship selection navigation (left/right) and confirmation
   - Highscore overlay is not accessible
+
 - **Playing state**:
   - Game loop runs: input → update → collision → render
   - Alien formation moves and descends
-  - Player ship responds to input
-  - Projectiles fire and move
+  - Player ship responds to input with type-specific movement speed
+  - Projectiles fire and move with type-specific behavior (regular: single alien; slow: up to three aliens)
   - Collision detection active
   - Score increments on alien destruction
   - Highscore overlay accessible via 'H' key
+
 - **GameOver state**:
   - Game loop stops updating entities (no movement, no spawning)
   - Render shows final frame + game-over text + highscore list
   - Input only accepts new-session trigger (e.g., Enter/Space to restart)
   - Session highscore list displayed automatically
+
 - **Transition ShipSelection → Playing**: when player confirms a ship selection; `initializeGame(selectedShipType)` called which:
   - Sets up alien formation and ship position with the chosen ship type
+  - Configures ship movement speed and projectile behavior per type
   - Sets `gameState = 'playing'`
+
 - **Transition Playing → GameOver**: when any alien's y-position ≥ ship y-position OR alien bounding box intersects ship bounding box (UC-004).
+
 - **Transition GameOver → ShipSelection**: player presses restart key; `resetGame()` called which:
   - Clears all entities
   - Resets score to 0
@@ -98,8 +111,8 @@ stateDiagram-v2
 
     state ShipSelection {
         [*] --> ShowingOptions
-        ShowingOptions --> ShowingOptions: navigate options
-        ShowingOptions --> Confirming: player confirms selection
+        ShowingOptions --> ShowingOptions: navigate options (left/right)
+        ShowingOptions --> Confirming: player confirms selection (Enter/Space)
     }
     state Playing {
         [*] --> Running
