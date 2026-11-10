@@ -8,8 +8,9 @@ realises:
   - PLAYER SHIP SELECTION
   - UC-001
   - UC-007
+  - UC-008
 follows:
-  - ARC-001
+  - ARC-003
 uses: []
 provides:
   - GameCommands
@@ -33,7 +34,7 @@ Translate raw keyboard events into canonical game commands for the Game Logic La
 
 ## Interfaces
 
-- **GameCommands**
+- `GameCommands` — Immutable data structure representing the player's intent for a single frame.
 
 ```typescript
 interface GameCommands {
