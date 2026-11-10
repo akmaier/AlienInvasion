@@ -28,6 +28,26 @@ The game shall present rows of alien invaders moving horizontally across the scr
 After reaching a screen edge, alien rows shall descend toward the player's ship.
 *Check:* `tests/integration/test_alien_movement.py::test_descend_after_edge` verifies that rows move downward after hitting an edge.
 
+**PLAYER SHIP SELECTION** *(github.com/akmaier)*
+The game shall present a ship selection screen at the start of a new game session where the player chooses one of the available ship types.
+*Check:* `tests/integration/test_ship_selection.py::test_ship_selection_screen` verifies that a selection screen is shown before gameplay starts and that the player can choose a ship type.
+
+**PLAYER SHIP TYPE REGULAR** *(github.com/akmaier)*
+The regular ship shall be an available ship type.
+*Check:* `tests/integration/test_ship_types.py::test_regular_ship_available` verifies the regular ship appears as a selectable option.
+
+**PLAYER SHIP TYPE SLOW** *(github.com/akmaier)*
+The slow ship shall be an available ship type.
+*Check:* `tests/integration/test_ship_types.py::test_slow_ship_available` verifies the slow ship appears as a selectable option.
+
+**PLAYER SHIP SLOW MOVEMENT** *(github.com/akmaier)*
+The slow ship shall move horizontally at a slower speed than the regular ship.
+*Check:* `tests/integration/test_ship_types.py::test_slow_ship_movement_speed` verifies the slow ship's movement speed is lower than the regular ship's.
+
+**PLAYER SHIP SLOW SPECIAL SHOT** *(github.com/akmaier)*
+The slow ship shall fire a special projectile that can destroy up to three aliens in a single shot.
+*Check:* `tests/integration/test_ship_types.py::test_slow_ship_special_shot` verifies the slow ship's projectile destroys up to three aliens per shot.
+
 **PLAYER MOVEMENT KEYS** *(github.com/akmaier)*
 The player's ship shall be movable horizontally across the bottom of the screen using either the Arrow‑Left/Arrow‑Right keys or the WASD keys (A/D).
 *Check:* `tests/unit/test_player_movement.py::test_key_controls` injects Arrow‑Left, Arrow‑Right, A and D keydown events and verifies that the ship's x‑position changes accordingly and remains within screen bounds.
