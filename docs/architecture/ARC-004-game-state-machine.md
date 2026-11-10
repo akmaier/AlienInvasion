@@ -18,6 +18,9 @@ forced_by:
   - SESSION HIGHSCORE DISPLAY GAMEOVER
   - SESSION HIGHSCORE DISPLAY INGAME
   - SESSION HIGHSCORE RESET
+  - PLAYER SHIP SELECTION
+  - PLAYER SHIP TYPE REGULAR
+  - PLAYER SHIP TYPE SLOW
   - KISS NO EXTRA FEATURES
   - YAGNI NO UNNECESSARY ABSTRACTION
   - UC-001
@@ -26,6 +29,7 @@ forced_by:
   - UC-004
   - UC-005
   - UC-006
+  - UC-007
 designs: []
 ---
 
@@ -33,12 +37,18 @@ designs: []
 
 ## Context
 
-The game has two primary states: **Playing** and **GameOver**. Transitions are triggered by game-over conditions (alien reaches bottom, alien collides with ship) and by the player starting a new session. The state machine controls which systems run each frame and which UI is visible.
+The game has three primary states: **ShipSelection**, **Playing**, and **GameOver**. Transitions are triggered by ship selection, game-over conditions (alien reaches bottom, alien collides with ship), and by the player starting a new session. The state machine controls which systems run each frame and which UI is visible.
 
 ## Decision
 
-A **simple two-state machine** implemented as a string variable `gameState` with values `'playing'` | `'gameover'`.
+A **simple three-state machine** implemented as a string variable `gameState` with values `'shipselection'` | `'playing'` | `'gameover'`.
 
+- **ShipSelection state**:
+  - Game loop renders the ship selection screen
+  - Player chooses between available ship types (regular or slow)
+  - No game entities (aliens, projectiles) are active
+  - Input only accepts ship selection navigation and confirmation
+  - Highscore overlay is not accessible
 - **Playing state**:
   - Game loop runs: input → update → collision → render
   - Alien formation moves and descends
@@ -52,20 +62,22 @@ A **simple two-state machine** implemented as a string variable `gameState` with
   - Render shows final frame + game-over text + highscore list
   - Input only accepts new-session trigger (e.g., Enter/Space to restart)
   - Session highscore list displayed automatically
+- **Transition ShipSelection → Playing**: when player confirms a ship selection; `initializeGame(selectedShipType)` called which:
+  - Sets up alien formation and ship position with the chosen ship type
+  - Sets `gameState = 'playing'`
 - **Transition Playing → GameOver**: when any alien's y-position ≥ ship y-position OR alien bounding box intersects ship bounding box (UC-004).
-- **Transition GameOver → Playing**: player presses restart key; `resetGame()` called which:
+- **Transition GameOver → ShipSelection**: player presses restart key; `resetGame()` called which:
   - Clears all entities
   - Resets score to 0
   - Clears session highscore list (UC-006: reset on new session)
-  - Re-initializes alien formation and ship position
-  - Sets `gameState = 'playing'`
+  - Sets `gameState = 'shipselection'` (new session starts with ship selection)
 
 No pause state, no menu state, no level transition — YAGNI.
 
 ## Alternatives
 
-- **Explicit state class hierarchy** (`PlayingState`, `GameOverState` with `enter()`, `update()`, `exit()`) — rejected: adds files and boilerplate for two states; violates YAGNI.
-- **State machine library (e.g., `xstate`)** — rejected: external dependency for a 2-state machine; violates YAGNI.
+- **Explicit state class hierarchy** (`ShipSelectionState`, `PlayingState`, `GameOverState` with `enter()`, `update()`, `exit()`) — rejected: adds files and boilerplate for three states; violates YAGNI.
+- **State machine library (e.g., `xstate`)** — rejected: external dependency for a 3-state machine; violates YAGNI.
 - **Enum-like object with sub-states** (e.g., `playing: { wave: 1 }`) — rejected: no wave/level concept in SPEC.
 
 ## Consequences
@@ -77,12 +89,18 @@ No pause state, no menu state, no level transition — YAGNI.
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Playing: resetGame()
+    [*] --> ShipSelection: resetGame()
+    ShipSelection --> Playing: ship selected (initializeGame())
     Playing --> GameOver: alien reaches bottom
     Playing --> GameOver: alien collides with ship
-    GameOver --> Playing: player restarts (resetGame())
+    GameOver --> ShipSelection: player restarts (resetGame())
     GameOver --> [*]: page unload
 
+    state ShipSelection {
+        [*] --> ShowingOptions
+        ShowingOptions --> ShowingOptions: navigate options
+        ShowingOptions --> Confirming: player confirms selection
+    }
     state Playing {
         [*] --> Running
         Running --> Running: each frame
