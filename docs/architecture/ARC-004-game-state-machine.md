@@ -31,7 +31,8 @@ forced_by:
   - UC-006
   - UC-007
   - UC-008
-designs: []
+designs:
+  - MOD-game-logic
 ---
 
 # ARC-004 Game State Machine

@@ -25,6 +25,7 @@ realises:
   - UC-008
 follows:
   - ARC-001
+  - ARC-004
 uses:
   - MOD-input.GameCommands
 provides:
@@ -61,7 +62,7 @@ Own all mutable game state and simulate the game rules each frame. This includes
 
 ## Interfaces
 
-- **GameState** (read-only snapshot for Rendering)
+- `GameState` — Immutable snapshot exposed to the Rendering Layer each frame. Contains the current phase (`ShipSelection`, `Playing`, `GameOver`), ship state (position, type, speed), alien positions, projectiles, score, highscore entries, overlay visibility flags, and ship selection options with the currently highlighted option.
 
 ```typescript
 interface GameState {
@@ -78,7 +79,7 @@ interface GameState {
 }
 ```
 
-- **HighscoreList**
+- `HighscoreList` — Manages the session highscore list (max 10 entries, sorted by score descending, timestamp ascending for ties). Provides `addEntry(score, initials)` to insert a new entry, `getEntries()` to retrieve a copy of the list, and `clear()` to reset the list on new session.
 
 ```typescript
 interface HighscoreList {
@@ -89,7 +90,7 @@ interface HighscoreList {
 }
 ```
 
-- **GameSession**
+- `GameSession` — Orchestrates the game loop: receives `GameCommands`, updates simulation, and produces `GameState`. Manages game phases and ship type selection. Provides `update(commands)`, `submitInitials(initials)`, `startNewGame()`, `toggleHighscoreOverlay()`, `selectShipType(shipType)`, `navigateShipSelection(direction)`, and `confirmShipSelection()`.
 
 ```typescript
 interface GameSession {
