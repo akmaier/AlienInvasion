@@ -57,7 +57,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: akmaier/agent-m
-          ref: 19a5155f83e841f20801c4ca279c1a6a1949a19c
+          ref: 024c25869960005156af88208794ee6dfa4de74b
           path: instance
       - uses: actions/setup-node@v4
         with:
@@ -92,7 +92,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: akmaier/agent-m
-          ref: 19a5155f83e841f20801c4ca279c1a6a1949a19c
+          ref: 024c25869960005156af88208794ee6dfa4de74b
           path: instance
           persist-credentials: false
       - uses: actions/setup-node@v4
@@ -147,7 +147,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: akmaier/agent-m
-          ref: 19a5155f83e841f20801c4ca279c1a6a1949a19c
+          ref: 024c25869960005156af88208794ee6dfa4de74b
           path: instance
           persist-credentials: false
       - uses: actions/setup-node@v4
@@ -198,7 +198,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: akmaier/agent-m
-          ref: 19a5155f83e841f20801c4ca279c1a6a1949a19c
+          ref: 024c25869960005156af88208794ee6dfa4de74b
           token: ${{ secrets.AGENT_M_TOKEN }}
           path: instance
       - uses: actions/setup-node@v4
