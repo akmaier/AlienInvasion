@@ -13,8 +13,9 @@ realises:
   - UC-005
   - UC-006
   - UC-007
+  - UC-008
 follows:
-  - ARC-001
+  - ARC-002
 uses:
   - MOD-game-logic.GameState
 provides:
@@ -45,7 +46,7 @@ Draw the current `GameState` to an HTML `<canvas>` and manage DOM overlays for s
 
 ## Interfaces
 
-- **Renderer**
+- `Renderer` — Facade coordinating all drawing and overlay management.
 
 ```typescript
 interface Renderer {
