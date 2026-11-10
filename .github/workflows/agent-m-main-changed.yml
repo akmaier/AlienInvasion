@@ -32,7 +32,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: akmaier/agent-m
-          ref: 024c25869960005156af88208794ee6dfa4de74b
+          ref: dc4e7daab85c710c6ec1a0cfe9f6dce168e0da19
           path: instance
           persist-credentials: false
       - uses: actions/setup-node@v4
