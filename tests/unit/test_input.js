@@ -1,3 +1,6 @@
+// Unit tests for the input module (src/input), ITM-001.
+// Covers: PLAYER MOVEMENT KEYS, PLAYER FIRE SPACEBAR, PLAYER SHIP SELECTION
+// Module under test: MOD-input (KeyboardHandler, GameCommands).
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { createGameCommands, KeyboardHandler } from '../../src/input/index.js';
@@ -60,8 +63,9 @@ describe('KeyboardHandler', () => {
     const handler = new KeyboardHandler();
     press(handler, 'ArrowLeft');
     assert.strictEqual(handler.getCommands().left, true);
-    assert.strictEqual(handler.getCommands().left, false);
+    assert.strictEqual(handler.getCommands().left, true); // still held
     release(handler, 'ArrowLeft');
+    assert.strictEqual(handler.getCommands().left, false);
 
     press(handler, 'KeyA');
     assert.strictEqual(handler.getCommands().left, true);
@@ -158,6 +162,8 @@ describe('KeyboardHandler', () => {
     assert.strictEqual(Object.isFrozen(first), true);
     assert.strictEqual(Object.isFrozen(second), true);
     assert.strictEqual(first.right, true);
-    assert.strictEqual(second.right, false);
+    assert.strictEqual(second.right, true); // still held
+    release(handler, 'ArrowRight');
+    assert.strictEqual(handler.getCommands().right, false);
   });
 });
