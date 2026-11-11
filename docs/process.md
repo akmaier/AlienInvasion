@@ -1,9 +1,10 @@
 ---
 model: waterfall
 model_file: src/model-catalogue/models/waterfall.md
+model_version: df363eeaa7556c59c974ec1e45131c7a518e8025
 ---
 
-# akmaier/AlienInvasion — Process
+# AlienInvasion — Process
 
 Declares exactly one process model: **waterfall** (book *Vibe Coding*, chapter 6), as carried in the instance's catalogue at `src/model-catalogue/models/waterfall.md`. Chosen per the person's instruction to build Alien Invasion following the waterfall model; SPEC §5 requires exactly one declared process model before implementation starts, and none exists yet for the product. The model's five phases run in sequence (Requirements Analysis & Specification → System & Software Design → Development & Testing → Integration & System Testing → Release & Maintenance), each gated by a Reviewer decision before the next phase opens.
 
