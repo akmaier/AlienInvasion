@@ -140,20 +140,22 @@ for (const p of files) {
     try {
       execSync(`node --test "${p}"`, { cwd: ROOT, stdio: 'pipe' });
       process.stderr.write(`record-test-results: PASS ${rel}\n`);
-    } catch {
+    } catch (e) {
       passed = false;
-      process.stderr.write(`record-test-results: FAIL ${rel}\n`);
+      process.stderr.write(`record-test-results: FAIL ${rel} status=${e.status}\n`);
+      process.stderr.write(`   STDOUT: ${(e.stdout || '').toString().slice(0, 500)}\n`);
+      process.stderr.write(`   STDERR: ${(e.stderr || '').toString().slice(0, 1200)}\n`);
     }
   } else if (rel.endsWith('.py')) {
     guards = pySpecs(text);
     testCount = (text.match(/(?:^|\n)[ \t]*def test_/g) || []).length;
-    const module = 'tests.' + rel.slice(0, -3).replace(/\//g, '.');
+    const module = rel.slice(0, -3).replace(/\//g, '.');
     try {
       execSync(`python3 -m unittest ${module}`, { cwd: ROOT, stdio: 'pipe' });
       process.stderr.write(`record-test-results: PASS ${rel}\n`);
-    } catch {
+    } catch (e) {
       passed = false;
-      process.stderr.write(`record-test-results: FAIL ${rel}\n`);
+      process.stderr.write(`record-test-results: FAIL ${rel} status=${e.status}\n`);
     }
   } else {
     executable = false; // review document: static check, guarded by its presence
