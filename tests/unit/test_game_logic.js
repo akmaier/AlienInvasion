@@ -454,7 +454,7 @@ describe('GameSession (MOD-game-logic; end-to-end simulation per frame)', () => 
     assert.strictEqual(session.phase, 'GameOver');
   });
 
-  it('restarts from GameOver into ShipSelection, clearing score and highscores', () => {
+  it('restarts from GameOver into ShipSelection, clearing the score but keeping the highscores (SESSION HIGHSCORE RESET: the session is the page session)', () => {
     const session = newSession();
     session.confirmShipSelection();
     session.formation.speed = 0;
@@ -466,7 +466,9 @@ describe('GameSession (MOD-game-logic; end-to-end simulation per frame)', () => 
     session.confirmShipSelection(); // restart
     assert.strictEqual(session.phase, 'ShipSelection');
     assert.strictEqual(session.score.get(), 0);
-    assert.strictEqual(session.highscores.getEntries().length, 0);
+    assert.strictEqual(session.highscores.getEntries().length, 1, 'restart keeps the highscore entry');
+    // a fresh session (page reload = new GameSession) starts empty
+    assert.strictEqual(newSession().highscores.getEntries().length, 0);
   });
 
   it('submits initials for the final score on game over', () => {

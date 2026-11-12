@@ -105,10 +105,13 @@ export class GameSession {
     } else if (this.phase === 'Playing') {
       this.updatePlaying(commands);
     } else if (this.phase === 'GameOver') {
-      // GameOver -> ShipSelection on restart (ARC-004): clears entities, score,
-      // and the session highscore list. While initials are awaited, the confirm
-      // key submits them instead (handled by the entry point), so it must not
-      // restart the session here.
+      // GameOver -> ShipSelection on restart (ARC-004): clears entities and
+      // score but keeps the session highscore list - the session is the page's
+      // session (it starts when the page loads), so a restart starts a new
+      // game in the same session and keeps the list (SESSION HIGHSCORE RESET
+      // resets only on a new page session). While initials are awaited, the
+      // confirm key submits them instead (handled by the entry point), so it
+      // must not restart the session here.
       if (commands.confirm && !this.#prevCommands.confirm && !this.awaitingInitials) {
         this.startNewGame();
       }
@@ -217,7 +220,11 @@ export class GameSession {
     this.finalScore = this.score.get();
   }
 
-  /** Starts a new session: back to ShipSelection, score and highscores cleared. */
+  /** Starts a new game in the current session: back to ShipSelection, score
+   *  cleared. The session highscore list is kept: the session is the page's
+   *  session (it starts when the page is loaded), so a restart keeps the
+   *  list and only a new page session starts empty (SESSION HIGHSCORE
+   *  RESET). */
   startNewGame() {
     this.ship = new Ship({
       x: this.screenWidth / 2 - SHIP_WIDTH / 2,
@@ -233,7 +240,6 @@ export class GameSession {
       height: PROJECTILE_HEIGHT,
     });
     this.score.reset();
-    this.highscores.clear();
     this.phase = 'ShipSelection';
     this.selectedShipOption = 0;
     this.showHighscoreOverlay = false;

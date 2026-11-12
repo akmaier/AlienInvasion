@@ -32,15 +32,19 @@ interface HighscoreEntry {
 }
 ```
 
-- **Storage**: `let highscores: HighscoreEntry[] = [];` — module-level variable, not persisted.
+- **Storage**: one `HighscoreStore` per `GameSession`; a `GameSession` is created once
+  when the page loads (game.js `start()`), so the store starts empty at page load
+  and lives for the whole page session — not for one game.
 - **Insertion** (on game over):
   1. Prompt for initials (default "AAA" if empty/cancelled — UC-006 A1).
   2. Create entry `{ score, initials, timestamp: Date.now() }`.
   3. Push to array.
   4. Sort: `score` descending, then `timestamp` ascending (UC-006 A2).
   5. Slice to max 10 entries.
-- **Access**: getter `getHighscores(): ReadonlyArray<HighscoreEntry>` returns a shallow copy.
-- **Reset**: `clearHighscores()` sets array to `[]` — called by `resetGame()` on new session.
+- **Access**: getter `getEntries(): HighscoreEntry[]` returns a copy.
+- **Reset**: the list is reset when a new page session starts (new page load → new
+  `GameSession` → empty `HighscoreStore`). `startNewGame()` on restart keeps the list
+  — the session is the page's session, not one game (SESSION HIGHSCORE RESET, UC-006).
 - **No localStorage / IndexedDB / cookies** — SPEC says session-only.
 
 ## Alternatives
@@ -71,6 +75,6 @@ flowchart TD
     ShowOverlay --> Read[Read getHighscores()]
     Read --> RenderList[Render List]
     
-    NewSession[New Session] --> Clear[clearHighscores()]
-    Clear --> Empty[Array = []]
+    NewSession[New page session / page load] --> Empty[New GameSession, empty HighscoreStore]
+    Restart[Restart after game over] --> Kept[List is kept]
 ```

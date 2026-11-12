@@ -159,11 +159,15 @@ describe('System: full playthrough (UC-001 .. UC-008)', () => {
     assert.ok(dom.gameOver.textContent.includes('JMN'));
     assert.ok(dom.gameOver.textContent.includes(String(state.score)));
 
-    // Restart clears score and highscores (SESSION HIGHSCORE RESET)
+    // Restart clears the score but keeps the session highscore list (the
+    // session is the page's session; SESSION HIGHSCORE RESET resets only on a
+    // new page session)
     frame(session, renderer, { ...NOOP, confirm: true });
     assert.strictEqual(session.phase, 'ShipSelection');
     assert.strictEqual(session.score.get(), 0);
-    assert.strictEqual(session.highscores.getEntries().length, 0);
+    assert.strictEqual(session.highscores.getEntries().length, 1, 'restart keeps the highscore entry');
+    const fresh = createSession({ screenWidth: SCREEN_WIDTH, screenHeight: SCREEN_HEIGHT });
+    assert.strictEqual(fresh.highscores.getEntries().length, 0, 'new page session starts with an empty list');
   });
 
   it('plays a full game with the regular ship: standard speed, one alien per shot', () => {
@@ -258,10 +262,13 @@ describe('System: full playthrough (UC-001 .. UC-008)', () => {
     const entries = session.highscores.getEntries();
     assert.strictEqual(entries.length, 10);
     assert.deepStrictEqual(entries.map((e) => e.score), [100, 90, 80, 70, 60, 55, 50, 40, 35, 30]);
-    // a further new session clears the list
+    // a restart keeps the list (same page session); a fresh GameSession,
+    // i.e. a new page session, starts with an empty list (SESSION HIGHSCORE RESET)
     frame(session, renderer, { ...NOOP, confirm: true });
     assert.strictEqual(session.phase, 'ShipSelection');
-    assert.strictEqual(session.highscores.getEntries().length, 0);
+    assert.strictEqual(session.highscores.getEntries().length, 10, 'restart keeps the session highscore list');
+    const fresh = createSession({ screenWidth: SCREEN_WIDTH, screenHeight: SCREEN_HEIGHT });
+    assert.strictEqual(fresh.highscores.getEntries().length, 0, 'new page session starts with an empty list');
   });
 
   it('highscore overlay opens and closes in-game (SESSION HIGHSCORE DISPLAY INGAME)', () => {

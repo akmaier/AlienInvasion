@@ -217,7 +217,7 @@ describe('Game over (UC-004)', () => {
     assert.strictEqual(state.phase, 'GameOver');
   });
 
-  it('restarts into ShipSelection, clearing score and highscores (SESSION HIGHSCORE RESET)', () => {
+  it('restarts into ShipSelection, clearing the score but keeping the highscores (SESSION HIGHSCORE RESET: the session is the page session)', () => {
     const session = newSession();
     const renderer = createRenderer(mockContext(), newDom());
     frame(session, renderer, createGameCommands({ confirm: true }));
@@ -231,7 +231,9 @@ describe('Game over (UC-004)', () => {
     frame(session, renderer, createGameCommands({ confirm: true })); // restart
     assert.strictEqual(session.phase, 'ShipSelection');
     assert.strictEqual(session.score.get(), 0);
-    assert.strictEqual(session.highscores.getEntries().length, 0);
+    assert.strictEqual(session.highscores.getEntries().length, 1, 'restart keeps the highscore entry');
+    // a fresh session (page reload = new GameSession) starts empty
+    assert.strictEqual(newSession().highscores.getEntries().length, 0);
   });
 });
 
