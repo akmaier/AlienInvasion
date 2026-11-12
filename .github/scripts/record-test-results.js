@@ -43,9 +43,9 @@ function first(re, s) {
   return m ? m[1] : null;
 }
 
-const npmTotal = first(/ℹ tests (\d+)/, outNpm);
-const npmPass = first(/ℹ pass (\d+)/, outNpm);
-const npmFail = first(/ℹ fail (\d+)/, outNpm);
+const npmTotal = first(/(?:#|ℹ)\s+tests\s+(\d+)/, outNpm);
+const npmPass = first(/(?:#|ℹ)\s+pass\s+(\d+)/, outNpm);
+const npmFail = first(/(?:#|ℹ)\s+fail\s+(\d+)/, outNpm);
 const pyRan = first(/Ran (\d+) tests/, outPy);
 const pyOk = exitPy === 0 && /\nOK\b/.test(outPy);
 
@@ -211,9 +211,9 @@ const record = {
   exit_code: allExecutablePassed ? 0 : 1,
   summary: {
     suites: fileRecords.length,
-    tests: Number(npmTotal) !== null ? Number(npmTotal) + Number(pyRan || 0) : totalTests,
-    passed: Number(npmPass) !== null ? Number(npmPass) + (pyOk ? Number(pyRan || 0) : 0) : totalPassed,
-    failed: Number(npmFail) !== null ? Number(npmFail) + (pyOk ? 0 : Number(pyRan || 0)) : totalFailed,
+    tests: npmTotal !== null ? Number(npmTotal) + Number(pyRan || 0) : totalTests,
+    passed: npmPass !== null ? Number(npmPass) + (pyOk ? Number(pyRan || 0) : 0) : totalPassed,
+    failed: npmFail !== null ? Number(npmFail) + (pyOk ? 0 : Number(pyRan || 0)) : totalFailed,
   },
   runner: {
     npm: { tests: npmTotal, passed: npmPass, failed: npmFail, exit: exitNpm },

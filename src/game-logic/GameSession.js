@@ -205,7 +205,13 @@ export class GameSession {
 
   checkGameOver() {
     const aliens = this.formation.aliens;
-    if (aliens.length === 0) return;
+    if (aliens.length === 0) {
+      // GAME END ALL ALIENS DESTROYED: destroying every alien ends the game;
+      // the end shows as a game over does, so final score, initials and the
+      // session highscore list apply unchanged.
+      this.gameOver();
+      return;
+    }
     if (
       CollisionSystem.checkAlienGround(aliens, this.ship.y) ||
       CollisionSystem.checkAlienShip(aliens, this.ship)
