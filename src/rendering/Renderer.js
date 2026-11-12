@@ -51,6 +51,11 @@ export class Renderer {
     this.initialsPrompt.show(callback);
   }
 
+  /** Reads the current initials from the prompt's input and submits them via the callback registered at show() time. */
+  submitInitials() {
+    this.initialsPrompt.submit();
+  }
+
   hideInitialsPrompt() {
     this.initialsPrompt.hide();
   }

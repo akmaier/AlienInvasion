@@ -52,6 +52,7 @@ Draw the current `GameState` to an HTML `<canvas>` and manage DOM overlays for s
 interface Renderer {
   render(state: GameState): void;
   showInitialsPrompt(callback: (initials: string) => void): void;
+  submitInitials(): void;
   hideInitialsPrompt(): void;
 }
 ```
@@ -84,6 +85,7 @@ classDiagram
         -shipSelectionScreen: ShipSelectionScreen
         +render(state: GameState): void
         +showInitialsPrompt(callback: (initials: string) => void): void
+        +submitInitials(): void
         +hideInitialsPrompt(): void
     }
     class CanvasRenderer {
