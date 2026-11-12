@@ -1,0 +1,72 @@
+# Agent M's test schedule for akmaier/AlienInvasion.
+#
+# Runs the product's tests (npm test = the JavaScript suites; the SPEC-named
+# Python checks under tests/) and records one result record per run on the
+# `test-results` branch: per test file its level (module / subsystem / system /
+# release, per docs/plan/* front matter) and the SPEC requirement it guards
+# (# SPEC: / # *Check: / // Requirements exercised:), plus which of the
+# product's requirements are guarded by a passing test. Agent M's Tests page
+# reads that record; without this workflow every level counts 0 tests.
+#
+# Triggered on every push to main (every merge), on a daily schedule, and on
+# demand. It never pushes to main, so it cannot trigger itself.
+#
+# See .github/scripts/record-test-results.js for the record format.
+
+name: Agent M tests
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test-schedule:
+    name: Agent M test schedule
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Run JavaScript tests
+        id: npm
+        run: |
+          set +e
+          npm test > "$RUNNER_TEMP/agent-m-tests-npm.out" 2>&1
+          code=$?
+          {
+            echo "AGENT_M_TESTS_OUTPUT_NPM<<EOF"
+            cat "$RUNNER_TEMP/agent-m-tests-npm.out"
+            echo "EOF"
+            echo "AGENT_M_TESTS_EXIT_NPM=$code"
+          } >> "$GITHUB_ENV"
+      - name: Run SPEC-named Python checks
+        id: py
+        run: |
+          set +e
+          python3 -m unittest discover -s tests -p 'test_*.py' > "$RUNNER_TEMP/agent-m-tests-py.out" 2>&1
+          code=$?
+          {
+            echo "AGENT_M_TESTS_OUTPUT_PY<<EOF"
+            cat "$RUNNER_TEMP/agent-m-tests-py.out"
+            echo "EOF"
+            echo "AGENT_M_TESTS_EXIT_PY=$code"
+          } >> "$GITHUB_ENV"
+      - name: Record the test result
+        env:
+          AGENT_M_TESTS_OUTPUT_NPM: ${{ env.AGENT_M_TESTS_OUTPUT_NPM }}
+          AGENT_M_TESTS_EXIT_NPM: ${{ env.AGENT_M_TESTS_EXIT_NPM }}
+          AGENT_M_TESTS_OUTPUT_PY: ${{ env.AGENT_M_TESTS_OUTPUT_PY }}
+          AGENT_M_TESTS_EXIT_PY: ${{ env.AGENT_M_TESTS_EXIT_PY }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node .github/scripts/record-test-results.js
