@@ -1,23 +1,23 @@
 {
   "workflow": "Agent M tests",
   "product": "akmaier/AlienInvasion",
-  "run_id": "local",
+  "run_id": "43268389416",
   "run_attempt": "1",
-  "commit": "e9b7f04ea2b0b0954be352234a8d3201f62b6d35",
+  "commit": "da8f0cde461776fa8a675c36c9644ea7f9df168b",
   "ref": "refs/heads/main",
-  "ran_at": "2026-11-12T17:18:55.960Z",
+  "ran_at": "2026-11-12T17:20:39.198Z",
   "exit_code": 0,
   "summary": {
     "suites": 19,
-    "tests": 125,
-    "passed": 125,
+    "tests": 21,
+    "passed": 21,
     "failed": 0
   },
   "runner": {
     "npm": {
-      "tests": "104",
-      "passed": "104",
-      "failed": "0",
+      "tests": null,
+      "passed": null,
+      "failed": null,
       "exit": 0
     },
     "python": {
