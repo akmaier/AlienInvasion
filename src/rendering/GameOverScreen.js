@@ -16,11 +16,11 @@ export class GameOverScreen {
       .map((e, i) => `<div>${i + 1}. ${e.initials} — ${e.score}</div>`)
       .join('');
     this.element.innerHTML = `<div class="game-over">Game Over</div><div>Final score: ${finalScore}</div><div class="highscore-list">${list}</div>`;
-    this.element.style.display = '';
+    this.element.classList.add('show');
   }
 
   hide() {
     this.element.innerHTML = '';
-    this.element.style.display = 'none';
+    this.element.classList.remove('show');
   }
 }

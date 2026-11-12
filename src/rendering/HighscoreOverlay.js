@@ -15,11 +15,11 @@ export class HighscoreOverlay {
       .map((e) => `<div>${e.initials} — ${e.score}</div>`)
       .join('');
     this.element.innerHTML = `<div class="highscore-overlay">${list}</div>`;
-    this.element.style.display = '';
+    this.element.classList.add('show');
   }
 
   hide() {
     this.element.innerHTML = '';
-    this.element.style.display = 'none';
+    this.element.classList.remove('show');
   }
 }

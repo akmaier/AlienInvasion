@@ -22,10 +22,10 @@ export class ShipSelectionScreen {
   }
 
   show() {
-    this.element.style.display = '';
+    this.element.classList.add('show');
   }
 
   hide() {
-    this.element.style.display = 'none';
+    this.element.classList.remove('show');
   }
 }
