@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alien Invasion</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
+  canvas { display: block; margin: auto; background: #000; }
+  #score { position: absolute; top: 10px; left: 10px; font-size: 20px; pointer-events: none; }
+  .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); display: none; text-align: center; padding-top: 80px; font-size: 24px; pointer-events: none; }
+  .overlay.show { display: block; }
+  #initials-prompt input { font-size: 20px; padding: 4px 8px; }
+  #ship-selection .option { display: inline-block; margin: 0 12px; padding: 8px 16px; border: 3px solid #666; background: #111; cursor: default; user-select: none; }
+  #ship-selection .option.selected { border-color: #fff; background: #222; }
+</style>
+</head>
+<body>
+<div id="score">Score: 0</div>
+<canvas width="800" height="600"></canvas>
+<div id="game-over" class="overlay"></div>
+<div id="highscore-overlay" class="overlay"></div>
+<div id="initials-prompt" class="overlay">
+  <div>Game Over - enter initials (up to 3 characters)</div>
+  <input id="initials-input" maxlength="3">
+</div>
+<div id="ship-selection" class="overlay"></div>
+<script type="module" src="game.js"></script>
+</body>
+</html>
