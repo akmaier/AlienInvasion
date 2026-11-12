@@ -1,23 +1,23 @@
 {
   "workflow": "Agent M tests",
   "product": "akmaier/AlienInvasion",
-  "run_id": "43268403521",
+  "run_id": "local",
   "run_attempt": "1",
-  "commit": "4f6d65e894c8315b737edba1998e0e0bf2dfe01e",
+  "commit": "63917b99a735c53d16ad1b5739ada5b0d0a82a71",
   "ref": "refs/heads/main",
-  "ran_at": "2026-11-12T17:20:48.665Z",
+  "ran_at": "2026-11-12T17:32:05.084Z",
   "exit_code": 0,
   "summary": {
     "suites": 19,
-    "tests": 21,
-    "passed": 21,
+    "tests": 125,
+    "passed": 125,
     "failed": 0
   },
   "runner": {
     "npm": {
-      "tests": null,
-      "passed": null,
-      "failed": null,
+      "tests": "104",
+      "passed": "104",
+      "failed": "0",
       "exit": 0
     },
     "python": {
@@ -35,8 +35,8 @@
     },
     "system": {
       "files": 8,
-      "tests": 33,
-      "passed": 33,
+      "tests": 34,
+      "passed": 34,
       "failed": 0
     },
     "release": {
@@ -213,9 +213,11 @@
     },
     {
       "name": "GAME END ALL ALIENS DESTROYED",
-      "guarded_by": [],
+      "guarded_by": [
+        "tests/integration/test_game_over.py"
+      ],
       "guarded_by_review": [],
-      "passing": false
+      "passing": true
     },
     {
       "name": "SCORE DISPLAY",
@@ -322,11 +324,12 @@
       "file": "tests/integration/test_game_over.py",
       "language": "python",
       "level": "system",
-      "tests": 1,
+      "tests": 2,
       "passed": true,
       "executable": true,
       "guards": [
-        "GAME OVER CONDITION"
+        "GAME OVER CONDITION",
+        "GAME END ALL ALIENS DESTROYED"
       ]
     },
     {

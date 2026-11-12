@@ -3,9 +3,9 @@
   "product": "akmaier/AlienInvasion",
   "run_id": "local",
   "run_attempt": "1",
-  "commit": "e9b7f04ea2b0b0954be352234a8d3201f62b6d35",
+  "commit": "63917b99a735c53d16ad1b5739ada5b0d0a82a71",
   "ref": "refs/heads/main",
-  "ran_at": "2026-11-12T17:18:55.960Z",
+  "ran_at": "2026-11-12T17:32:05.084Z",
   "exit_code": 0,
   "summary": {
     "suites": 19,
@@ -35,8 +35,8 @@
     },
     "system": {
       "files": 8,
-      "tests": 33,
-      "passed": 33,
+      "tests": 34,
+      "passed": 34,
       "failed": 0
     },
     "release": {
@@ -212,6 +212,14 @@
       "passing": true
     },
     {
+      "name": "GAME END ALL ALIENS DESTROYED",
+      "guarded_by": [
+        "tests/integration/test_game_over.py"
+      ],
+      "guarded_by_review": [],
+      "passing": true
+    },
+    {
       "name": "SCORE DISPLAY",
       "guarded_by": [
         "tests/system/test_overlay_visibility.js",
@@ -316,11 +324,12 @@
       "file": "tests/integration/test_game_over.py",
       "language": "python",
       "level": "system",
-      "tests": 1,
+      "tests": 2,
       "passed": true,
       "executable": true,
       "guards": [
-        "GAME OVER CONDITION"
+        "GAME OVER CONDITION",
+        "GAME END ALL ALIENS DESTROYED"
       ]
     },
     {
