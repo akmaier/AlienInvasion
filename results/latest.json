@@ -1,11 +1,11 @@
 {
   "workflow": "Agent M tests",
   "product": "akmaier/AlienInvasion",
-  "run_id": "43268389416",
+  "run_id": "43268403521",
   "run_attempt": "1",
-  "commit": "da8f0cde461776fa8a675c36c9644ea7f9df168b",
+  "commit": "4f6d65e894c8315b737edba1998e0e0bf2dfe01e",
   "ref": "refs/heads/main",
-  "ran_at": "2026-11-12T17:20:39.198Z",
+  "ran_at": "2026-11-12T17:20:48.665Z",
   "exit_code": 0,
   "summary": {
     "suites": 19,
@@ -210,6 +210,12 @@
       ],
       "guarded_by_review": [],
       "passing": true
+    },
+    {
+      "name": "GAME END ALL ALIENS DESTROYED",
+      "guarded_by": [],
+      "guarded_by_review": [],
+      "passing": false
     },
     {
       "name": "SCORE DISPLAY",
