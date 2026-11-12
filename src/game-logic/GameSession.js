@@ -104,8 +104,13 @@ export class GameSession {
       this.updateShipSelection(commands);
     } else if (this.phase === 'Playing') {
       this.updatePlaying(commands);
+    } else if (this.phase === 'GameOver') {
+      // GameOver -> ShipSelection on restart (ARC-004): clears entities, score,
+      // and the session highscore list.
+      if (commands.confirm && !this.#prevCommands.confirm) {
+        this.startNewGame();
+      }
     }
-    // GameOver: no simulation runs; restart goes through confirmShipSelection().
     this.#prevCommands = createGameCommands(commands);
     return this.getState();
   }
