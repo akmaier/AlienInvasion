@@ -1,0 +1,234 @@
+{
+  "workflow": "Agent M tests",
+  "product": "akmaier/AlienInvasion",
+  "run_id": "local",
+  "run_attempt": "1",
+  "commit": "611ecede37f64116797ca49787019148137247db",
+  "ref": "refs/heads/main",
+  "ran_at": "2026-11-12T17:05:36.825Z",
+  "exit_code": 1,
+  "summary": {
+    "suites": 19,
+    "tests": 125,
+    "passed": 125,
+    "failed": 0
+  },
+  "runner": {
+    "npm": {
+      "tests": "104",
+      "passed": "104",
+      "failed": "0",
+      "exit": 0
+    },
+    "python": {
+      "ran": "21",
+      "ok": true,
+      "exit": 0
+    }
+  },
+  "levels": {
+    "subsystem": {
+      "files": 1,
+      "tests": 13,
+      "passed": 13,
+      "failed": 0
+    },
+    "system": {
+      "files": 8,
+      "tests": 33,
+      "passed": 19,
+      "failed": 14
+    },
+    "release": {
+      "files": 2,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0
+    },
+    "module": {
+      "files": 8,
+      "tests": 79,
+      "passed": 72,
+      "failed": 7
+    }
+  },
+  "requirements": [],
+  "files": [
+    {
+      "file": "tests/component/test_game_loop.js",
+      "language": "javascript",
+      "level": "subsystem",
+      "tests": 13,
+      "passed": true,
+      "executable": true,
+      "guards": []
+    },
+    {
+      "file": "tests/integration/test_alien_movement.py",
+      "language": "python",
+      "level": "system",
+      "tests": 2,
+      "passed": false,
+      "executable": true,
+      "guards": []
+    },
+    {
+      "file": "tests/integration/test_game_over.py",
+      "language": "python",
+      "level": "system",
+      "tests": 1,
+      "passed": false,
+      "executable": true,
+      "guards": []
+    },
+    {
+      "file": "tests/integration/test_session_highscore.py",
+      "language": "python",
+      "level": "system",
+      "tests": 5,
+      "passed": false,
+      "executable": true,
+      "guards": [
+        "SESSION HIGHSCORE LIMIT",
+        "SESSION HIGHSCORE DISPLAY GAMEOVER",
+        "SESSION HIGHSCORE DISPLAY INGAME",
+        "SESSION HIGHSCORE RESET"
+      ]
+    },
+    {
+      "file": "tests/integration/test_ship_selection.py",
+      "language": "python",
+      "level": "system",
+      "tests": 1,
+      "passed": false,
+      "executable": true,
+      "guards": []
+    },
+    {
+      "file": "tests/integration/test_ship_types.py",
+      "language": "python",
+      "level": "system",
+      "tests": 4,
+      "passed": false,
+      "executable": true,
+      "guards": []
+    },
+    {
+      "file": "tests/integration/test_web_implementation.py",
+      "language": "python",
+      "level": "system",
+      "tests": 1,
+      "passed": false,
+      "executable": true,
+      "guards": []
+    },
+    {
+      "file": "tests/review/architecture_review.md",
+      "language": "markdown",
+      "level": "release",
+      "tests": 0,
+      "passed": true,
+      "executable": false,
+      "guards": []
+    },
+    {
+      "file": "tests/review/code_review.md",
+      "language": "markdown",
+      "level": "release",
+      "tests": 0,
+      "passed": true,
+      "executable": false,
+      "guards": []
+    },
+    {
+      "file": "tests/system/test_overlay_visibility.js",
+      "language": "javascript",
+      "level": "system",
+      "tests": 13,
+      "passed": true,
+      "executable": true,
+      "guards": []
+    },
+    {
+      "file": "tests/system/test_playthrough.js",
+      "language": "javascript",
+      "level": "system",
+      "tests": 6,
+      "passed": true,
+      "executable": true,
+      "guards": []
+    },
+    {
+      "file": "tests/unit/test_collision.py",
+      "language": "python",
+      "level": "module",
+      "tests": 2,
+      "passed": false,
+      "executable": true,
+      "guards": []
+    },
+    {
+      "file": "tests/unit/test_game_logic.js",
+      "language": "javascript",
+      "level": "module",
+      "tests": 40,
+      "passed": true,
+      "executable": true,
+      "guards": []
+    },
+    {
+      "file": "tests/unit/test_input.js",
+      "language": "javascript",
+      "level": "module",
+      "tests": 14,
+      "passed": true,
+      "executable": true,
+      "guards": []
+    },
+    {
+      "file": "tests/unit/test_player_fire.py",
+      "language": "python",
+      "level": "module",
+      "tests": 1,
+      "passed": false,
+      "executable": true,
+      "guards": []
+    },
+    {
+      "file": "tests/unit/test_player_movement.py",
+      "language": "python",
+      "level": "module",
+      "tests": 1,
+      "passed": false,
+      "executable": true,
+      "guards": []
+    },
+    {
+      "file": "tests/unit/test_projectile.py",
+      "language": "python",
+      "level": "module",
+      "tests": 2,
+      "passed": false,
+      "executable": true,
+      "guards": []
+    },
+    {
+      "file": "tests/unit/test_rendering.js",
+      "language": "javascript",
+      "level": "module",
+      "tests": 18,
+      "passed": true,
+      "executable": true,
+      "guards": []
+    },
+    {
+      "file": "tests/unit/test_ui.py",
+      "language": "python",
+      "level": "module",
+      "tests": 1,
+      "passed": false,
+      "executable": true,
+      "guards": []
+    }
+  ]
+}
