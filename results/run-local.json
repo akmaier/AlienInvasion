@@ -3,26 +3,26 @@
   "product": "akmaier/AlienInvasion",
   "run_id": "local",
   "run_attempt": "1",
-  "commit": "cbd4dc7d3ad9448a5a1d3a90f161bd75a292951d",
+  "commit": "a51e8ce8f10168ca6d91c093039ad46b51932250",
   "ref": "refs/heads/main",
-  "ran_at": "2026-11-12T17:14:24.350Z",
+  "ran_at": "2026-11-12T17:17:50.356Z",
   "exit_code": 1,
   "summary": {
     "suites": 19,
-    "tests": 125,
-    "passed": 125,
+    "tests": 0,
+    "passed": 0,
     "failed": 0
   },
   "runner": {
     "npm": {
-      "tests": "104",
-      "passed": "104",
-      "failed": "0",
+      "tests": null,
+      "passed": null,
+      "failed": null,
       "exit": 0
     },
     "python": {
-      "ran": "21",
-      "ok": true,
+      "ran": null,
+      "ok": false,
       "exit": 0
     }
   },
