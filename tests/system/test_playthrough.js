@@ -271,9 +271,9 @@ describe('System: full playthrough (UC-001 .. UC-008)', () => {
     selectShip(session, renderer, 'regular');
     session.toggleHighscoreOverlay();
     frame(session, renderer, NOOP);
-    assert.strictEqual(dom.highscoreOverlay.style.display, '');
+    assert.ok(dom.highscoreOverlay.classList.contains('show'), 'highscore overlay must be shown');
     session.toggleHighscoreOverlay();
     frame(session, renderer, NOOP);
-    assert.strictEqual(dom.highscoreOverlay.style.display, 'none');
+    assert.ok(!dom.highscoreOverlay.classList.contains('show'), 'highscore overlay must be hidden');
   });
 });

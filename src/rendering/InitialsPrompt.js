@@ -12,12 +12,12 @@ export class InitialsPrompt {
   /** @param {(initials: string) => void} callback */
   show(callback) {
     this.callback = callback;
-    this.element.style.display = '';
+    this.element.classList.add('show');
   }
 
   hide() {
     this.callback = null;
-    this.element.style.display = 'none';
+    this.element.classList.remove('show');
   }
 
   /** Reads the input and hands the initials to the callback. */

@@ -256,10 +256,10 @@ describe('Input device wiring (UC-001, UC-006)', () => {
     session.toggleHighscoreOverlay();
     const state = frame(session, renderer, createGameCommands());
     renderer.render(state);
-    assert.strictEqual(dom.highscoreOverlay.style.display, '');
+    assert.ok(dom.highscoreOverlay.classList.contains('show'), 'highscore overlay must be shown');
     session.toggleHighscoreOverlay();
     const state2 = frame(session, renderer, createGameCommands());
     renderer.render(state2);
-    assert.strictEqual(dom.highscoreOverlay.style.display, 'none');
+    assert.ok(!dom.highscoreOverlay.classList.contains('show'), 'highscore overlay must be hidden');
   });
 });

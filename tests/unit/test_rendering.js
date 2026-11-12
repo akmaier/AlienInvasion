@@ -211,14 +211,13 @@ describe('ShipSelectionScreen (MOD-rendering; PLAYER SHIP SELECTION / PLAYER SHI
     assert.ok(selected[1].includes('Slow ship'));
   });
 
-  it('shows and hides', () => {
+  it('shows and hides (toggles the `show` class the page CSS displays)', () => {
     const el = fakeElement();
     const screen = new ShipSelectionScreen(el);
-    el.style.display = 'none';
     screen.show();
-    assert.strictEqual(el.style.display, '');
+    assert.ok(el.classList.contains('show'), 'show() must add the `show` class');
     screen.hide();
-    assert.strictEqual(el.style.display, 'none');
+    assert.ok(!el.classList.contains('show'), 'hide() must remove the `show` class');
   });
 });
 
@@ -244,13 +243,12 @@ describe('HighscoreOverlay (MOD-rendering; SESSION HIGHSCORE DISPLAY INGAME)', (
   it('shows the list when opened and hides when closed', () => {
     const el = fakeElement();
     const overlay = new HighscoreOverlay(el);
-    el.style.display = 'none';
     overlay.show([{ score: 55, initials: 'AAA', timestamp: 1 }]);
-    assert.strictEqual(el.style.display, '');
+    assert.ok(el.classList.contains('show'), 'show() must add the `show` class');
     assert.ok(el.textContent.includes('AAA'));
     assert.ok(el.textContent.includes('55'));
     overlay.hide();
-    assert.strictEqual(el.style.display, 'none');
+    assert.ok(!el.classList.contains('show'), 'hide() must remove the `show` class');
     assert.strictEqual(el.textContent, '');
   });
 });
@@ -261,11 +259,11 @@ describe('InitialsPrompt (MOD-rendering; SESSION HIGHSCORE DATA)', () => {
     const prompt = new InitialsPrompt(el);
     let result;
     prompt.show((initials) => { result = initials; });
-    assert.strictEqual(el.style.display, '');
+    assert.ok(el.classList.contains('show'), 'show() must add the `show` class');
     el.value = 'XY';
     prompt.submit();
     assert.strictEqual(result, 'XY');
-    assert.strictEqual(el.style.display, 'none');
+    assert.ok(!el.classList.contains('show'), 'hide() must remove the `show` class');
     el.value = '';
     prompt.show((initials) => { result = initials; }); // re-arm after hide
     prompt.submit();
@@ -279,10 +277,10 @@ describe('Renderer phase overlays (MOD-rendering)', () => {
     const dom = { score: fakeElement(), gameOver: fakeElement(), highscoreOverlay: fakeElement(), initialsPrompt: fakeElement(), shipSelection: fakeElement() };
     const renderer = new Renderer(ctx, dom);
     renderer.render(baseState({ phase: 'ShipSelection', selectedShipOption: 1 }));
-    assert.strictEqual(dom.shipSelection.style.display, '');
+    assert.ok(dom.shipSelection.classList.contains('show'), 'ship selection screen must be shown');
     assert.ok(dom.shipSelection.innerHTML.includes('Slow ship'));
     assert.strictEqual(dom.gameOver.textContent, '');
-    assert.strictEqual(dom.highscoreOverlay.style.display, 'none');
+    assert.ok(!dom.highscoreOverlay.classList.contains('show'), 'other overlays must be hidden');
   });
 
   it('shows the game-over screen with final score and highscore list in the GameOver phase', () => {
@@ -292,7 +290,7 @@ describe('Renderer phase overlays (MOD-rendering)', () => {
     renderer.render(baseState({ phase: 'GameOver', score: 42 }));
     assert.ok(dom.gameOver.textContent.includes('42'));
     assert.ok(dom.gameOver.textContent.includes('ABC'));
-    assert.strictEqual(dom.shipSelection.style.display, 'none');
+    assert.ok(!dom.shipSelection.classList.contains('show'), 'ship selection must be hidden');
   });
 
   it('toggles the in-game highscore overlay via showHighscoreOverlay', () => {
@@ -300,10 +298,10 @@ describe('Renderer phase overlays (MOD-rendering)', () => {
     const dom = { score: fakeElement(), gameOver: fakeElement(), highscoreOverlay: fakeElement(), initialsPrompt: fakeElement(), shipSelection: fakeElement() };
     const renderer = new Renderer(ctx, dom);
     renderer.render(baseState({ phase: 'Playing', showHighscoreOverlay: true }));
-    assert.strictEqual(dom.highscoreOverlay.style.display, '');
+    assert.ok(dom.highscoreOverlay.classList.contains('show'), 'highscore overlay must be shown');
     assert.ok(dom.highscoreOverlay.textContent.includes('ABC'));
     renderer.render(baseState({ phase: 'Playing', showHighscoreOverlay: false }));
-    assert.strictEqual(dom.highscoreOverlay.style.display, 'none');
+    assert.ok(!dom.highscoreOverlay.classList.contains('show'), 'highscore overlay must be hidden');
   });
 
   it('delegates initials prompt display', () => {
@@ -311,8 +309,8 @@ describe('Renderer phase overlays (MOD-rendering)', () => {
     const dom = { score: fakeElement(), gameOver: fakeElement(), highscoreOverlay: fakeElement(), initialsPrompt: fakeElement(), shipSelection: fakeElement() };
     const renderer = new Renderer(ctx, dom);
     renderer.showInitialsPrompt(() => {});
-    assert.strictEqual(dom.initialsPrompt.style.display, '');
+    assert.ok(dom.initialsPrompt.classList.contains('show'), 'initials prompt must be shown');
     renderer.hideInitialsPrompt();
-    assert.strictEqual(dom.initialsPrompt.style.display, 'none');
+    assert.ok(!dom.initialsPrompt.classList.contains('show'), 'initials prompt must be hidden');
   });
 });
