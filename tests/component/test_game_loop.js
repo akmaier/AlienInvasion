@@ -1,6 +1,7 @@
 // Component tests for the entry point and main loop (game.js, index.html), ITM-004.
 // Module under test: the requestAnimationFrame loop wiring MOD-input, MOD-game-logic,
 // MOD-rendering (ARC-001, ARC-004).
+// Test level: subsystem
 // Requirements exercised: IMPLEMENTATION JAVASCRIPT WEB; end-to-end behaviour of UC-001..UC-008.
 // Runs in plain Node: game.js skips the browser start-up when window/document are absent,
 // so the exported factories can be driven frame by frame with fakes.

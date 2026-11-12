@@ -1,5 +1,6 @@
 // Unit tests for the rendering module (src/rendering), ITM-003.
 // Module under test: MOD-rendering.
+// Test level: module
 // Requirements exercised:
 //   SCORE DISPLAY, SESSION HIGHSCORE DISPLAY GAMEOVER/INGAME,
 //   PLAYER SHIP SELECTION, PLAYER SHIP TYPE REGULAR/SLOW,

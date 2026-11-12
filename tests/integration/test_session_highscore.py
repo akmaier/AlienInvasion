@@ -4,6 +4,7 @@
 # *Check:* tests/integration/test_session_highscore.py::test_highscore_display_gameover
 # *Check:* tests/integration/test_session_highscore.py::test_highscore_access_ingame
 # *Check:* tests/integration/test_session_highscore.py::test_highscore_reset_on_new_session
+# Test level: system
 #
 # Drives the real game code through Node: GameSession owns a HighscoreStore
 # (one per page session), entries hold score/initials/timestamp, the list is

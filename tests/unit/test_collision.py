@@ -1,6 +1,7 @@
 # SPEC: ALIEN DESTRUCTION / SCORE INCREMENT
 # *Check:* tests/unit/test_collision.py::test_alien_removal
 # *Check:* tests/unit/test_collision.py::test_score_increment
+# Test level: module
 #
 # Drives the real game code through Node: a projectile is placed over an alien
 # and GameSession.update runs the real CollisionSystem; the alien's removal and

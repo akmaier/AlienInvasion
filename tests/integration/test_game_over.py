@@ -1,5 +1,6 @@
 # SPEC: GAME OVER CONDITION
 # *Check:* tests/integration/test_game_over.py::test_game_over_conditions
+# Test level: system
 #
 # Drives the real game code through Node: an alien reaching the bottom or
 # colliding with the ship switches GameSession to GameOver and stops all

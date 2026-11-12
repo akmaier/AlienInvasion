@@ -1,6 +1,7 @@
 # SPEC: PROJECTILE TRAVEL / PROJECTILE REMOVAL
 # *Check:* tests/unit/test_projectile.py::test_upward_speed
 # *Check:* tests/unit/test_projectile.py::test_removal_conditions
+# Test level: module
 #
 # Drives the real game code through Node: projectiles are spawned via
 # GameSession.update and their positions are observed on the real GameState

@@ -1,5 +1,6 @@
 // Unit tests for the game logic module (src/game-logic), ITM-002.
 // Module under test: MOD-game-logic.
+// Test level: module
 // Requirements exercised:
 //   GAMEPLAY HORIZONTAL MOVEMENT, GAMEPLAY DESCENDING MOVEMENT,
 //   PROJECTILE TRAVEL, PROJECTILE REMOVAL, ALIEN DESTRUCTION, SCORE INCREMENT,

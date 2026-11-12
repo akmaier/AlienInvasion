@@ -1,4 +1,5 @@
 // System tests: overlays are actually visible on the real index.html page,
+// Test level: system
 // computed from the page's own CSS. Runs in plain Node (CI has no browser;
 // the game loop equivalent is test_playthrough.js). Module under test:
 // MOD-rendering (src/rendering) together with index.html at the repository

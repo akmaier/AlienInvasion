@@ -1,5 +1,6 @@
 # SPEC: PLAYER FIRE SPACEBAR
 # *Check:* tests/unit/test_player_fire.py::test_spacebar_fires
+# Test level: module
 #
 # Drives the real game code through Node: a fake window receives a Spacebar
 # keydown event via the real KeyboardHandler, GameSession.update is fed the
