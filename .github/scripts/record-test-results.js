@@ -55,7 +55,7 @@ const specText = readFileSync(`${ROOT}/SPEC.md`, 'utf-8');
 const requirementsSection = specText.split('## Requirements')[1] || '';
 const SPEC_NAMES = [];
 for (const line of requirementsSection.split('\n')) {
-  const m = line.match(/^\*\*([^*]+?)\*\*\s*\(/);
+  const m = line.match(/^\*\*([^*]+?)\*\*\s*\*\s*\(/);
   if (m) SPEC_NAMES.push(m[1].trim());
 }
 
