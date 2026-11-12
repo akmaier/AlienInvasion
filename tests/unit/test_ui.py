@@ -1,5 +1,6 @@
 # SPEC: SCORE DISPLAY
 # *Check:* tests/unit/test_ui.py::test_score_display
+# Test level: module
 #
 # Drives the real game code through Node: GameSession.update runs the game and
 # the real Renderer draws the score into a fake DOM element; the visible text

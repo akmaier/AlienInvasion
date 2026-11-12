@@ -1,5 +1,6 @@
 # SPEC: PLAYER MOVEMENT KEYS
 # *Check:* tests/unit/test_player_movement.py::test_key_controls
+# Test level: module
 #
 # Drives the real game code (src/game-logic, src/input) through Node: a fake
 # window receives Arrow-Left / Arrow-Right / A / D keydown events via the real

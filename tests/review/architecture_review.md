@@ -1,5 +1,7 @@
 # Architecture review — YAGNI NO UNNECESSARY ABSTRACTION
 
+Test level: release — guards YAGNI NO UNNECESSARY ABSTRACTION.
+
 Static review of the source files for the YAGNI NO UNNECESSARY ABSTRACTION
 requirement: no architectural abstraction (extra modules, classes, or inheritance
 hierarchies) unless required to satisfy an existing requirement; each module must

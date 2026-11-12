@@ -4,6 +4,7 @@
 # *Check:* tests/integration/test_ship_types.py::test_slow_ship_available
 # *Check:* tests/integration/test_ship_types.py::test_slow_ship_movement_speed
 # *Check:* tests/integration/test_ship_types.py::test_slow_ship_special_shot
+# Test level: system
 #
 # Drives the real game code through Node: ship selection offers regular and
 # slow, the slow ship moves slower, and its special projectile destroys up to

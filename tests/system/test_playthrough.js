@@ -1,4 +1,5 @@
 // System tests: full-game playthrough through the real modules, ITM-005.
+// Test level: system
 // Drives GameSession frame by frame with a mock canvas context and fake DOM
 // overlays (Playwright against the real index.html is not part of this
 // repository's CI; this battery is the Node equivalent). Covers every

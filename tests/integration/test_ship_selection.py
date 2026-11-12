@@ -1,5 +1,6 @@
 # SPEC: PLAYER SHIP SELECTION
 # *Check:* tests/integration/test_ship_selection.py::test_ship_selection_screen
+# Test level: system
 #
 # Drives the real game code through Node: a new session starts in the
 # ShipSelection phase offering the available ship types, navigating highlights

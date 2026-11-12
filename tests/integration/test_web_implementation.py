@@ -1,5 +1,6 @@
 # SPEC: IMPLEMENTATION JAVASCRIPT WEB
 # *Check:* tests/integration/test_web_implementation.py::test_client_side_application
+# Test level: subsystem
 #
 # index.html (repository root) must load a .js file and the game must run
 # client-side without a server: the real game.js loads in plain Node (it skips

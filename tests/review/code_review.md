@@ -1,5 +1,7 @@
 # Code review — KISS NO EXTRA FEATURES
 
+Test level: release — guards KISS NO EXTRA FEATURES.
+
 Static review of the source files for the KISS NO EXTRA FEATURES requirement:
 the codebase shall contain no feature beyond the core gameplay described in the
 SPEC (e.g. power-ups, multiple levels, sound effects).

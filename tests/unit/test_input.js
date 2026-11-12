@@ -1,5 +1,6 @@
 // Unit tests for the input module (src/input), ITM-001.
 // Module under test: MOD-input (GameCommands, KeyboardHandler).
+// Test level: module
 // Requirements exercised: PLAYER MOVEMENT KEYS, PLAYER FIRE SPACEBAR, PLAYER SHIP SELECTION.
 // The module owns no game state; tests assert the GameCommands intent it emits from injected
 // keydown/keyup events. Ship movement resulting from these commands is asserted in ITM-002.

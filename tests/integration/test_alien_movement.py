@@ -1,6 +1,7 @@
 # SPEC: GAMEPLAY HORIZONTAL MOVEMENT / GAMEPLAY DESCENDING MOVEMENT
 # *Check:* tests/integration/test_alien_movement.py::test_horizontal_movement
 # *Check:* tests/integration/test_alien_movement.py::test_descend_after_edge
+# Test level: system
 #
 # Drives the real game code through Node: the alien formation is pushed to a
 # screen edge, GameSession.update runs the real AlienFormation, and the
