@@ -80,11 +80,14 @@ A **simple three-state machine** implemented as a string variable `gameState` wi
 
 - **Transition Playing → GameOver**: when any alien's y-position ≥ ship y-position OR alien bounding box intersects ship bounding box (UC-004).
 
-- **Transition GameOver → ShipSelection**: player presses restart key; `resetGame()` called which:
+- **Transition GameOver → ShipSelection**: player presses restart key; `startNewGame()` called which:
   - Clears all entities
   - Resets score to 0
-  - Clears session highscore list (UC-006: reset on new session)
-  - Sets `gameState = 'shipselection'` (new session starts with ship selection)
+  - Keeps the session highscore list: the session is the page's session (it
+    starts when the page is loaded), so a restart starts a new game in the
+    same session and keeps the list. SESSION HIGHSCORE RESET resets the list
+    only on a new page session (UC-006).
+  - Sets phase to 'ShipSelection' (new game in the same session)
 
 No pause state, no menu state, no level transition — YAGNI.
 
@@ -103,7 +106,7 @@ No pause state, no menu state, no level transition — YAGNI.
 
 ```mermaid
 stateDiagram-v2
-    [*] --> ShipSelection: resetGame()
+    [*] --> ShipSelection: startNewGame() (new page session: empty list)
     ShipSelection --> Playing: ship selected (initializeGame())
     Playing --> GameOver: alien reaches bottom
     Playing --> GameOver: alien collides with ship
