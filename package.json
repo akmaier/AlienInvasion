@@ -1,0 +1,8 @@
+{
+  "name": "alieninvasion",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --test 'tests/**/*.js'"
+  }
+}
