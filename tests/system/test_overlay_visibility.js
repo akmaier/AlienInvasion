@@ -46,7 +46,7 @@ function fakeElement(id, tagName, classes, parentNode) {
     addEventListener() {},
     setAttribute() {},
     getAttribute() { return null; },
-    querySelector() { return null; },
+    querySelector(selector) { return findMatching(el._children, selector); },
     querySelectorAll(selector) { return el._children.filter((child) => matches(child, selector)); },
   };
   el.classList = {
@@ -90,13 +90,28 @@ function plainElement(id, tagName = 'DIV') {
   return fakeElement(id, tagName, [], null);
 }
 
+/** An input element: carries a `value` and a `focus()` that records focus. */
+function inputElement(id, initialValue = '') {
+  const el = fakeElement(id, 'INPUT');
+  el.value = initialValue;
+  el.focused = false;
+  el.focus = () => { el.focused = true; };
+  el.blur = () => { el.focused = false; };
+  return el;
+}
+
 function newDom() {
+  const initialsPrompt = overlayElement('initials-prompt');
+  const initialsInput = inputElement('initials-input');
+  initialsPrompt._children.push(initialsInput);
+  initialsInput.parentNode = initialsPrompt;
   return {
     score: plainElement('score'),
     canvas: plainElement(undefined, 'canvas'),
     gameOver: overlayElement('game-over'),
     highscoreOverlay: overlayElement('highscore-overlay'),
-    initialsPrompt: overlayElement('initials-prompt'),
+    initialsPrompt,
+    initialsInput,
     shipSelection: overlayElement('ship-selection'),
   };
 }
@@ -265,6 +280,16 @@ function matches(element, selector) {
   });
 }
 
+/** First descendant (including via nested children) matching a simple selector. */
+function findMatching(children, selector) {
+  for (const child of children || []) {
+    if (matchSimple(child, selector)) return child;
+    const deep = findMatching(child._children, selector);
+    if (deep) return deep;
+  }
+  return null;
+}
+
 // Sanity check on the parser: the page really does hide .overlay and show .overlay.show.
 it('parses the page CSS: .overlay is display:none, .overlay.show is display:block', () => {
   const overlay = RULES.find((r) => r.selector === '.overlay');
@@ -402,6 +427,74 @@ describe('Ship selection highlight on the real page (MOD-rendering; PLAYER SHIP 
   });
 });
 
+describe('Initials entry on the real page (SESSION HIGHSCORE DATA; UC-006 A1)', () => {
+  it('makes the prompt and its input receive pointer events on the real page CSS', () => {
+    const dom = newDom();
+    assert.strictEqual(computedStyle(dom.initialsPrompt, 'pointer-events'), 'auto', 'the prompt must receive pointer events');
+    assert.strictEqual(computedStyle(dom.initialsInput, 'pointer-events'), 'auto', 'the input must receive pointer events');
+  });
+
+  it('focuses the input when the prompt is shown', () => {
+    const dom = newDom();
+    const renderer = createRenderer(mockContext(), dom);
+    renderer.showInitialsPrompt(() => {});
+    assert.strictEqual(dom.initialsInput.focused, true, 'show() must focus the initials input');
+    renderer.hideInitialsPrompt();
+    assert.strictEqual(dom.initialsInput.focused, false, 'hide() must blur the input');
+  });
+
+  it('submits the typed initials from the input (not AAA)', () => {
+    const dom = newDom();
+    const renderer = createRenderer(mockContext(), dom);
+    let submitted;
+    renderer.showInitialsPrompt((initials) => { submitted = initials; });
+    dom.initialsInput.value = 'JMN';
+    renderer.submitInitials();
+    assert.strictEqual(submitted, 'JMN', 'submit() must read the typed initials from the input');
+    assert.strictEqual(computedDisplay(dom.initialsPrompt, RULES), 'none', 'submit() must hide the prompt');
+  });
+
+  it('keeps the final score visible while initials are awaited and stores the submitted entry', () => {
+    const ctx = mockContext();
+    const dom = newDom();
+    const renderer = createRenderer(ctx, dom);
+    const session = createSession({ screenWidth: 800, screenHeight: 600 });
+    const idle = () => ({ left: false, right: false, fire: false, confirm: false, highscoreToggle: false });
+    const step = (c) => { const s = session.update(c); renderer.render(s); return s; };
+
+    step({ ...idle(), confirm: true }); // Playing
+    session.formation.speed = 0;
+    session.formation.aliens[0].y = session.ship.y - session.formation.aliens[0].height;
+    let state = step(idle()); // GameOver, awaiting initials
+    assert.strictEqual(state.phase, 'GameOver');
+    assert.strictEqual(state.awaitingInitials, true);
+    assert.strictEqual(computedDisplay(dom.gameOver, RULES), 'block', 'game-over screen is displayed');
+    assert.ok(dom.gameOver.textContent.includes(String(state.score)), 'final score is visible');
+    assert.strictEqual(computedDisplay(dom.initialsPrompt, RULES), 'none', 'initials prompt not shown until prompted');
+
+    renderer.showInitialsPrompt((initials) => {
+      session.submitInitials(initials);
+      renderer.hideInitialsPrompt();
+    });
+    assert.strictEqual(computedDisplay(dom.initialsPrompt, RULES), 'block', 'initials prompt is displayed');
+    assert.strictEqual(dom.initialsInput.focused, true, 'show() must focus the input');
+    assert.ok(dom.gameOver.textContent.includes(String(state.score)), 'final score stays visible behind the prompt');
+
+    dom.initialsInput.value = 'JMN';
+    renderer.submitInitials();
+    assert.strictEqual(session.awaitingInitials, false, 'submission leaves the awaiting-initials state');
+    assert.strictEqual(computedDisplay(dom.initialsPrompt, RULES), 'none', 'prompt hidden after submit');
+    const entries = session.highscores.getEntries();
+    assert.strictEqual(entries.length, 1, 'highscore entry stored');
+    assert.strictEqual(entries[0].initials, 'JMN', 'typed initials stored');
+    assert.strictEqual(entries[0].score, state.score, 'final score stored');
+
+    renderer.render(session.getState());
+    assert.ok(dom.gameOver.textContent.includes(String(state.score)), 'final score still visible after submit');
+    assert.ok(dom.gameOver.textContent.includes('JMN'), 'submitted entry visible on game-over screen');
+  });
+});
+
 describe('Full playthrough visibility on the real page (MOD-rendering + MOD-game-logic; UC-001 .. UC-008)', () => {
   it('shows selection, play, game over, initials, highscores and a cleared restart in their phases', () => {
     const ctx = mockContext();
@@ -467,7 +560,7 @@ describe('Full playthrough visibility on the real page (MOD-rendering + MOD-game
     assert.strictEqual(computedDisplay(dom.highscoreOverlay, RULES), 'none');
 
     // 7. Enter initials -> submitted through the prompt and shown on the game-over screen
-    dom.initialsPrompt.value = 'JMN';
+    dom.initialsInput.value = 'JMN';
     prompt.submit();
     assert.strictEqual(computedDisplay(dom.initialsPrompt, RULES), 'none', 'initials prompt is hidden after submit');
     assert.strictEqual(session.highscores.getEntries().length, 1, 'highscore entry stored');
