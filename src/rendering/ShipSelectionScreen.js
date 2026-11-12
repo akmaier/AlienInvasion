@@ -16,7 +16,7 @@ export class ShipSelectionScreen {
     this.element.innerHTML = options
       .map(
         (option, index) =>
-          `<div class="${index === selectedIndex ? 'selected' : ''}">${option.label} — ${option.description}</div>`
+          `<div class="option${index === selectedIndex ? ' selected' : ''}">${option.label} — ${option.description}</div>`
       )
       .join('');
   }
