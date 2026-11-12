@@ -203,12 +203,8 @@ describe('ShipSelectionScreen (MOD-rendering; PLAYER SHIP SELECTION / PLAYER SHI
     const el = fakeElement();
     const screen = new ShipSelectionScreen(el);
     screen.render(baseState().shipSelectionOptions, 1);
-    assert.ok(el.innerHTML.includes('Regular ship'));
-    assert.ok(el.innerHTML.includes('Slow ship'));
-    assert.ok(el.innerHTML.includes('three aliens per shot'));
-    const selected = el.innerHTML.match(/<div[^>]*class="selected"[^>]*>(.*?)<\/div>/);
-    assert.ok(selected, 'expected a highlighted selected option');
-    assert.ok(selected[1].includes('Slow ship'));
+    assert.ok(el.innerHTML.includes('<div class="option">Regular ship — Standard speed, standard projectile.</div>'));
+    assert.ok(el.innerHTML.includes('<div class="option selected">Slow ship — Slower movement; special projectile destroys up to three aliens per shot.</div>'));
   });
 
   it('shows and hides (toggles the `show` class the page CSS displays)', () => {

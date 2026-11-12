@@ -24,25 +24,30 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { createRenderer } from '../../game.js';
+import { createSession, createRenderer } from '../../game.js';
+import { InitialsPrompt } from '../../src/rendering/index.js';
 
 const OVERLAY_IDS = ['game-over', 'highscore-overlay', 'initials-prompt', 'ship-selection'];
 
-function overlayElement(id) {
+/** One fake DOM element: classList, textContent/innerHTML, and child elements
+ *  parsed from `innerHTML` so selector matching (incl. descendant selectors)
+ *  works against the page's CSS cascade. */
+function fakeElement(id, tagName, classes, parentNode) {
   const el = {
     id,
-    tagName: 'DIV',
+    tagName: tagName || 'DIV',
     style: {},
-    _classes: new Set(['overlay']),
-    parentNode: null,
+    _classes: new Set(classes || []),
+    parentNode,
     _html: '',
     _text: '',
     value: '',
+    _children: [],
     addEventListener() {},
     setAttribute() {},
     getAttribute() { return null; },
     querySelector() { return null; },
-    querySelectorAll() { return []; },
+    querySelectorAll(selector) { return el._children.filter((child) => matches(child, selector)); },
   };
   el.classList = {
     add(...c) { c.forEach((x) => el._classes.add(x)); },
@@ -55,41 +60,34 @@ function overlayElement(id) {
   });
   Object.defineProperty(el, 'innerHTML', {
     get() { return el._html; },
-    set(v) { el._html = String(v); el._text = String(v).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(); },
+    set(v) {
+      el._html = String(v);
+      el._text = String(v).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      el._children = parseChildren(el._html, el);
+    },
   });
   return el;
 }
 
+/** Parses `<div class="...">text</div>` children out of an innerHTML assignment. */
+function parseChildren(html, parentNode) {
+  const children = [];
+  const re = /<div[^>]*class="([^"]*)"[^>]*>([^<]*)<\/div>/gi;
+  let match;
+  while ((match = re.exec(html)) !== null) {
+    const child = fakeElement(undefined, 'DIV', match[1].split(/\s+/).filter(Boolean), parentNode);
+    child._text = match[2];
+    children.push(child);
+  }
+  return children;
+}
+
+function overlayElement(id) {
+  return fakeElement(id, 'DIV', ['overlay'], null);
+}
+
 function plainElement(id, tagName = 'DIV') {
-  const el = {
-    id,
-    tagName,
-    style: {},
-    _classes: new Set(),
-    parentNode: null,
-    _html: '',
-    _text: '',
-    value: '',
-    addEventListener() {},
-    setAttribute() {},
-    getAttribute() { return null; },
-    querySelector() { return null; },
-    querySelectorAll() { return []; },
-  };
-  el.classList = {
-    add(...c) { c.forEach((x) => el._classes.add(x)); },
-    remove(...c) { c.forEach((x) => el._classes.delete(x)); },
-    contains(c) { return el._classes.has(c); },
-  };
-  Object.defineProperty(el, 'textContent', {
-    get() { return el._text; },
-    set(v) { el._text = String(v); },
-  });
-  Object.defineProperty(el, 'innerHTML', {
-    get() { return el._html; },
-    set(v) { el._html = String(v); el._text = String(v).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(); },
-  });
-  return el;
+  return fakeElement(id, tagName, [], null);
 }
 
 function newDom() {
@@ -114,7 +112,7 @@ function mockContext() {
   return ctx;
 }
 
-function baseState({ phase = 'Playing', score = 0, showHighscoreOverlay = false, awaitingInitials = false, highscores } = {}) {
+function baseState({ phase = 'Playing', score = 0, showHighscoreOverlay = false, awaitingInitials = false, highscores, selectedShipOption = 0 } = {}) {
   return {
     phase,
     ship: { x: 380, y: 560, width: 40, height: 30, shipType: 'regular' },
@@ -131,7 +129,7 @@ function baseState({ phase = 'Playing', score = 0, showHighscoreOverlay = false,
       { type: 'regular', label: 'Regular ship', description: 'Standard speed, standard projectile.' },
       { type: 'slow', label: 'Slow ship', description: 'Slower movement; special projectile destroys up to three aliens per shot.' },
     ],
-    selectedShipOption: 0,
+    selectedShipOption,
   };
 }
 
@@ -143,27 +141,59 @@ function pageStylesheet() {
   return match[1];
 }
 
-/** Parses a stylesheet into display rules: { selector, specificity, display }. */
-function parseDisplayRules(css) {
+/** Parses a stylesheet into rules: { selector, specificity, declarations }. */
+function parseStyleRules(css) {
   const rules = [];
   for (const block of css.split('}')) {
     const open = block.indexOf('{');
     if (open === -1) continue;
     const selector = block.slice(0, open).trim();
-    let display = null;
+    const declarations = {};
     for (const decl of block.slice(open + 1).split(';')) {
       const colon = decl.indexOf(':');
       if (colon === -1) continue;
       const prop = decl.slice(0, colon).trim().toLowerCase();
       const value = decl.slice(colon + 1).trim().toLowerCase();
-      if (prop === 'display') display = value;
+      if (prop !== '') declarations[prop] = value;
     }
-    if (selector && display !== null) {
-      rules.push({ selector, specificity: selectorSpecificity(selector), display });
+    if (selector !== '') {
+      rules.push({ selector, specificity: selectorSpecificity(selector), declarations });
     }
   }
   return rules;
 }
+
+/** Computed `display`: inline style wins, then the page's cascade. */
+function computedDisplay(element, rules) {
+  const inline = String(element.style.display || '').trim();
+  if (inline !== '') return inline;
+  let best = null;
+  for (const rule of rules) {
+    if (matches(element, rule.selector) && rule.declarations.display !== undefined &&
+        (!best || specCompare(rule.specificity, best.specificity) >= 0)) {
+      best = rule;
+    }
+  }
+  return best ? best.declarations.display : null;
+}
+
+/** Computed value of any CSS property: inline style wins, then the page's cascade. */
+function computedStyle(element, prop, rules) {
+  const inline = element.style[prop];
+  if (inline !== undefined && String(inline).trim() !== '') return String(inline);
+  rules = rules || RULES;
+  let best = null;
+  for (const rule of rules) {
+    if (matches(element, rule.selector) && rule.declarations[prop] !== undefined &&
+        (!best || specCompare(rule.specificity, best.specificity) >= 0)) {
+      best = rule;
+    }
+  }
+  return best ? best.declarations[prop] : null;
+}
+
+const css = pageStylesheet();
+const RULES = parseStyleRules(css);
 
 function selectorSpecificity(selector) {
   let best = [0, 0, 0];
@@ -235,30 +265,14 @@ function matches(element, selector) {
   });
 }
 
-/** Computed `display` for an element: inline style wins, then the page's cascade. */
-function computedDisplay(element, rules) {
-  const inline = String(element.style.display || '').trim();
-  if (inline !== '') return inline;
-  let best = null;
-  for (const rule of rules) {
-    if (matches(element, rule.selector) && (!best || specCompare(rule.specificity, best.specificity) >= 0)) {
-      best = rule;
-    }
-  }
-  return best ? best.display : null;
-}
-
-const css = pageStylesheet();
-const RULES = parseDisplayRules(css);
-
 // Sanity check on the parser: the page really does hide .overlay and show .overlay.show.
 it('parses the page CSS: .overlay is display:none, .overlay.show is display:block', () => {
   const overlay = RULES.find((r) => r.selector === '.overlay');
   const overlayShow = RULES.find((r) => r.selector === '.overlay.show');
   assert.ok(overlay, 'expected a `.overlay` rule');
   assert.ok(overlayShow, 'expected a `.overlay.show` rule');
-  assert.strictEqual(overlay.display, 'none');
-  assert.strictEqual(overlayShow.display, 'block');
+  assert.strictEqual(overlay.declarations.display, 'none');
+  assert.strictEqual(overlayShow.declarations.display, 'block');
   assert.ok(specCompare(overlayShow.specificity, overlay.specificity) > 0, '`.overlay.show` must outrank `.overlay`');
 });
 
@@ -337,5 +351,139 @@ describe('Computed overlay visibility on the real page (MOD-rendering)', () => {
     assert.strictEqual(dom.score.textContent, 'Score: 7', 'score element shows the numeric score');
     assert.notStrictEqual(computedDisplay(dom.score, RULES), 'none', 'score must not be hidden by page CSS');
     assert.strictEqual(computedDisplay(dom.canvas, RULES), 'block', 'canvas must be displayed');
+  });
+});
+
+/** Asserts that exactly one of the two ship options is highlighted the way the
+ *  page CSS intends: the selected one via `#ship-selection .option.selected`,
+ *  the other only via `#ship-selection .option`. */
+function assertSelectedHighlighted(dom, selectedIndex) {
+  const options = dom.shipSelection.querySelectorAll('.option');
+  assert.strictEqual(options.length, 2, 'two ship options are rendered');
+  options.forEach((option, index) => {
+    if (index === selectedIndex) {
+      assert.strictEqual(computedStyle(option, 'background'), '#222', `option ${index} has the highlighted background`);
+      assert.strictEqual(computedStyle(option, 'border-color'), '#fff', `option ${index} has the highlighted border`);
+    } else {
+      assert.strictEqual(computedStyle(option, 'background'), '#111', `option ${index} keeps the default background`);
+      assert.strictEqual(computedStyle(option, 'border-color'), null, `option ${index} is not highlighted`);
+    }
+  });
+}
+
+describe('Ship selection highlight on the real page (MOD-rendering; PLAYER SHIP SELECTION, UC-007 A2)', () => {
+  it('highlights the selected ship option with the page CSS', () => {
+    const ctx = mockContext();
+    const dom = newDom();
+    const renderer = createRenderer(ctx, dom);
+    renderer.render(baseState({ phase: 'ShipSelection', selectedShipOption: 1 }));
+
+    const options = dom.shipSelection.querySelectorAll('.option');
+    assert.strictEqual(options.length, 2, 'both ship options are rendered');
+    assert.ok(options[0].classList.contains('option'), 'the regular option carries the `option` class');
+    assert.ok(options[1].classList.contains('option'), 'the slow option carries the `option` class');
+    assert.ok(!options[0].classList.contains('selected'), 'the regular option is not selected');
+    assert.ok(options[1].classList.contains('selected'), 'the slow option is selected');
+    assert.ok(options[0]._text.includes('Regular ship'), 'the first option is the regular ship');
+    assert.ok(options[1]._text.includes('Slow ship'), 'the second option is the slow ship');
+    assertSelectedHighlighted(dom, 1);
+  });
+
+  it('moves the highlight with the selection', () => {
+    const ctx = mockContext();
+    const dom = newDom();
+    const renderer = createRenderer(ctx, dom);
+
+    renderer.render(baseState({ phase: 'ShipSelection', selectedShipOption: 0 }));
+    assertSelectedHighlighted(dom, 0);
+
+    renderer.render(baseState({ phase: 'ShipSelection', selectedShipOption: 1 }));
+    assertSelectedHighlighted(dom, 1);
+  });
+});
+
+describe('Full playthrough visibility on the real page (MOD-rendering + MOD-game-logic; UC-001 .. UC-008)', () => {
+  it('shows selection, play, game over, initials, highscores and a cleared restart in their phases', () => {
+    const ctx = mockContext();
+    const dom = newDom();
+    const renderer = createRenderer(ctx, dom);
+    const session = createSession({ screenWidth: 800, screenHeight: 600 });
+
+    const idle = () => ({ left: false, right: false, fire: false, confirm: false, highscoreToggle: false });
+    const step = (commands) => { const state = session.update(commands); renderer.render(state); return state; };
+
+    // 1. Ship selection at start; the first option is highlighted
+    let state = step(idle());
+    assert.strictEqual(state.phase, 'ShipSelection');
+    assert.strictEqual(computedDisplay(dom.shipSelection, RULES), 'block', 'ship selection screen is displayed');
+    assertSelectedHighlighted(dom, 0);
+    assert.strictEqual(computedDisplay(dom.gameOver, RULES), 'none');
+    assert.strictEqual(computedDisplay(dom.highscoreOverlay, RULES), 'none');
+    assert.strictEqual(computedDisplay(dom.initialsPrompt, RULES), 'none');
+
+    // 2. Move the selection to the slow ship; the highlight moves with it
+    state = step({ ...idle(), right: true });
+    assert.strictEqual(state.selectedShipOption, 1);
+    assertSelectedHighlighted(dom, 1);
+    assert.strictEqual(computedDisplay(dom.shipSelection, RULES), 'block');
+
+    // 3. Confirm -> Playing: canvas and score visible, no overlay
+    state = step({ ...idle(), confirm: true });
+    assert.strictEqual(state.phase, 'Playing');
+    assert.strictEqual(session.ship.shipType, 'slow', 'the chosen ship type is active');
+    assert.strictEqual(computedDisplay(dom.canvas, RULES), 'block', 'the canvas is displayed during play');
+    assert.notStrictEqual(computedDisplay(dom.score, RULES), 'none', 'the score is displayed during play');
+    assert.strictEqual(computedDisplay(dom.shipSelection, RULES), 'none');
+    assert.strictEqual(computedDisplay(dom.gameOver, RULES), 'none');
+    assert.strictEqual(computedDisplay(dom.initialsPrompt, RULES), 'none');
+
+    // 4. Highscore overlay in-game ('H'), opened and closed
+    session.toggleHighscoreOverlay();
+    state = step(idle());
+    assert.strictEqual(computedDisplay(dom.highscoreOverlay, RULES), 'block', 'highscore overlay is displayed in-game');
+    session.toggleHighscoreOverlay();
+    state = step(idle());
+    assert.strictEqual(computedDisplay(dom.highscoreOverlay, RULES), 'none', 'highscore overlay is hidden again');
+
+    // 5. Game over: an alien reaches the bottom
+    session.formation.speed = 0;
+    session.formation.aliens[0].y = session.ship.y - session.formation.aliens[0].height;
+    state = step(idle());
+    assert.strictEqual(state.phase, 'GameOver');
+    assert.strictEqual(state.awaitingInitials, true);
+    assert.strictEqual(computedDisplay(dom.gameOver, RULES), 'block', 'game-over screen is displayed');
+    assert.ok(dom.gameOver.textContent.includes('Game Over'), 'game-over heading visible');
+    assert.ok(dom.gameOver.textContent.includes(String(state.score)), 'final score visible');
+    assert.strictEqual(computedDisplay(dom.shipSelection, RULES), 'none');
+
+    // 6. Initials prompt shown while the game awaits initials (game.js wires
+    // showInitialsPrompt the same way)
+    const prompt = new InitialsPrompt(dom.initialsPrompt);
+    prompt.show((initials) => {
+      session.submitInitials(initials);
+      renderer.hideInitialsPrompt();
+    });
+    assert.strictEqual(computedDisplay(dom.initialsPrompt, RULES), 'block', 'initials prompt is displayed');
+    assert.strictEqual(computedDisplay(dom.highscoreOverlay, RULES), 'none');
+
+    // 7. Enter initials -> submitted through the prompt and shown on the game-over screen
+    dom.initialsPrompt.value = 'JMN';
+    prompt.submit();
+    assert.strictEqual(computedDisplay(dom.initialsPrompt, RULES), 'none', 'initials prompt is hidden after submit');
+    assert.strictEqual(session.highscores.getEntries().length, 1, 'highscore entry stored');
+    assert.strictEqual(session.highscores.getEntries()[0].initials, 'JMN', 'initials stored');
+    renderer.render(session.getState());
+    assert.ok(dom.gameOver.textContent.includes('JMN'), 'highscore entry visible on game-over screen');
+
+    // 8. Restart -> ShipSelection again, score and highscores cleared
+    state = step({ ...idle(), confirm: true });
+    assert.strictEqual(state.phase, 'ShipSelection');
+    assert.strictEqual(state.score, 0, 'score cleared on restart');
+    assert.strictEqual(state.highscores.length, 0, 'highscores cleared on restart');
+    assertSelectedHighlighted(dom, 0);
+    assert.strictEqual(computedDisplay(dom.shipSelection, RULES), 'block', 'ship selection screen is displayed after restart');
+    assert.strictEqual(computedDisplay(dom.gameOver, RULES), 'none');
+    assert.strictEqual(computedDisplay(dom.initialsPrompt, RULES), 'none');
+    assert.strictEqual(computedDisplay(dom.highscoreOverlay, RULES), 'none');
   });
 });
