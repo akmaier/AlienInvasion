@@ -76,6 +76,10 @@ When a projectile collides with an alien, the player's score shall increase by o
 The game shall end when any alien reaches the bottom of the screen or collides with the player's ship.
 *Check:* `tests/integration/test_game_over.py::test_game_over_conditions` simulates an alien reaching the lower boundary or colliding with the ship and verifies that the game switches to a Game‑Over state and stops spawning new entities.
 
+**GAME END ALL ALIENS DESTROYED** *(github.com/akmaier)*
+The game shall end when every alien has been destroyed.
+*Check:* `tests/integration/test_game_over.py::test_game_ends_when_all_aliens_destroyed` destroys every alien of the formation and verifies that the game switches to the Game‑Over state.
+
 **SCORE DISPLAY** *(github.com/akmaier)*
 The current score shall be displayed prominently on the screen during gameplay.
 *Check:* `tests/unit/test_ui.py::test_score_display` inspects the DOM during play and verifies that a visible element shows the numeric score and updates after each alien destruction.

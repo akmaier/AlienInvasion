@@ -19,6 +19,7 @@ The hierarchy of the requirements, each member by its name.
   - GAME OVER CONDITION
   - SCORE DISPLAY
   - SCORE INCREMENT
+  - GAME END ALL ALIENS DESTROYED
 - Session Highscores
   - SESSION HIGHSCORE DATA
   - SESSION HIGHSCORE DISPLAY GAMEOVER
