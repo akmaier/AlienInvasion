@@ -106,8 +106,10 @@ export class GameSession {
       this.updatePlaying(commands);
     } else if (this.phase === 'GameOver') {
       // GameOver -> ShipSelection on restart (ARC-004): clears entities, score,
-      // and the session highscore list.
-      if (commands.confirm && !this.#prevCommands.confirm) {
+      // and the session highscore list. While initials are awaited, the confirm
+      // key submits them instead (handled by the entry point), so it must not
+      // restart the session here.
+      if (commands.confirm && !this.#prevCommands.confirm && !this.awaitingInitials) {
         this.startNewGame();
       }
     }

@@ -13,16 +13,27 @@ export class InitialsPrompt {
   show(callback) {
     this.callback = callback;
     this.element.classList.add('show');
+    // Give the input focus so typed initials go straight into the field.
+    const input = this.element.querySelector('#initials-input');
+    if (input && typeof input.focus === 'function') {
+      input.focus();
+    }
   }
 
   hide() {
     this.callback = null;
     this.element.classList.remove('show');
+    const input = this.element.querySelector('#initials-input');
+    if (input && typeof input.blur === 'function') {
+      input.blur();
+    }
   }
 
-  /** Reads the input and hands the initials to the callback. */
+  /** Reads the typed initials from the input and hands them to the callback. */
   submit() {
-    const initials = (this.element.value || '').slice(0, 3) || 'AAA';
+    const input = this.element.querySelector('#initials-input');
+    const raw = input ? input.value : this.element.value;
+    const initials = String(raw || '').slice(0, 3) || 'AAA';
     if (this.callback) {
       this.callback(initials);
     }

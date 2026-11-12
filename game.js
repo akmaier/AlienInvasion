@@ -45,6 +45,7 @@ function start() {
   const session = createSession({ screenWidth: SCREEN_WIDTH, screenHeight: SCREEN_HEIGHT });
   const renderer = createRenderer(ctx, dom);
   let wasAwaitingInitials = false;
+  let submittedInitials = false;
 
   function frame() {
     // 1. read input state
@@ -59,8 +60,18 @@ function start() {
         session.submitInitials(initials);
         renderer.hideInitialsPrompt();
       });
-    } else if (!state.awaitingInitials) {
+    }
+    if (state.awaitingInitials) {
+      // While the game awaits initials, the confirm key submits the typed
+      // initials; the game-over screen (with the final score) stays visible
+      // behind the prompt. Restart only happens once initials are submitted.
+      if (commands.confirm && !submittedInitials) {
+        renderer.submitInitials();
+        submittedInitials = true;
+      }
+    } else {
       renderer.hideInitialsPrompt();
+      submittedInitials = false;
     }
     wasAwaitingInitials = state.awaitingInitials;
 
