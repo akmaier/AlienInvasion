@@ -3,9 +3,9 @@
   "product": "akmaier/AlienInvasion",
   "run_id": "local",
   "run_attempt": "1",
-  "commit": "611ecede37f64116797ca49787019148137247db",
+  "commit": "cbd4dc7d3ad9448a5a1d3a90f161bd75a292951d",
   "ref": "refs/heads/main",
-  "ran_at": "2026-11-12T17:05:36.825Z",
+  "ran_at": "2026-11-12T17:14:24.350Z",
   "exit_code": 1,
   "summary": {
     "suites": 19,
