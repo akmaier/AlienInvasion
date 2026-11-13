@@ -22,8 +22,10 @@ Every file implements exactly one SPEC-guarded capability and nothing else:
 - Input: arrow keys / A-D movement, Spacebar fire (edge: one projectile per press),
   Enter/Space confirm, H highscore toggle. No other input actions.
 - Game logic: alien formation movement/descent, ship movement by type, projectile
-  travel/removal, collisions, scoring by +1 per alien, game-over conditions,
-  session highscore store. No power-ups, no levels/waves, no sound, no persistence.
+  travel/removal, collisions with hits counted per alien, scoring by +1 per removed
+  alien, waves (WAVE FIRST, WAVE NEXT), game-over conditions, session highscore store
+  kept in one browser cookie (SESSION HIGHSCORE COOKIE STORAGE, KEPT ON RELOAD). No
+  power-ups, no levels beyond the required waves, no sound, no other persistence.
 - Rendering: procedural canvas rectangles and text plus DOM overlays for score,
   game-over screen, highscore list, initials prompt, ship selection. No assets,
   no animations beyond the frame loop, no additional UI.

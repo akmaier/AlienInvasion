@@ -7,6 +7,8 @@
  * module knows nothing about input devices or rendering.
  *
  * Phases: ShipSelection -> Playing -> GameOver -> ShipSelection (new session).
+ * Within Playing the game advances through waves: clearing the formation
+ * starts the next wave, whose aliens need one more hit each (ARC-004).
  */
 import { createGameCommands } from '../../src/input/index.js';
 import { createGameState } from './GameState.js';
@@ -72,6 +74,7 @@ export class GameSession {
       spacingY: 55,
       speed: FORMATION_SPEED,
       descentStep: FORMATION_DESCENT_STEP,
+      hitsToDestroy: this.wave,
     });
   }
 
@@ -125,6 +128,7 @@ export class GameSession {
     this.formation.step();
     this.projectiles.step();
     this.resolveCollisions();
+    this.startNextWaveIfCleared();
     this.checkGameOver();
 
     if (commands.highscoreToggle && !this.#prevCommands.highscoreToggle) {
@@ -145,35 +149,31 @@ export class GameSession {
       hitsPerProjectile.set(projectileIndex, hits);
     }
 
-    const aliensToDestroy = new Set();
+    const hitAliens = [];
     const projectilesToRemove = new Set();
     for (const [projectileIndex, alienIndices] of hitsPerProjectile) {
       const projectile = projectiles[projectileIndex];
-      for (const alienIndex of alienIndices) {
-        aliensToDestroy.add(alienIndex);
-      }
       if (projectile.type === 'regular') {
+        // A regular projectile hits the first alien it intersects and is
+        // removed (UC-003 A1).
+        hitAliens.push(aliens[alienIndices[0]]);
         projectilesToRemove.add(projectileIndex);
       } else {
-        // Special projectile (slow ship): destroys up to three aliens in one
-        // shot, then is removed (ARC-006).
-        const capacity = 3 - projectile.aliensDestroyed;
-        const hits = alienIndices.slice(0, capacity);
-        projectile.aliensDestroyed += hits.length;
-        if (projectile.aliensDestroyed >= 3) {
+        // Special projectile (slow ship): hits up to three aliens, then is
+        // removed (ARC-006).
+        const hits = alienIndices.slice(0, 3 - projectile.aliensHit);
+        for (const alienIndex of hits) hitAliens.push(aliens[alienIndex]);
+        projectile.aliensHit += hits.length;
+        if (projectile.aliensHit >= 3) {
           projectilesToRemove.add(projectileIndex);
         }
       }
     }
 
-    // One point per destroyed alien (SCORE INCREMENT).
-    for (let i = 0; i < aliensToDestroy.size; i++) {
-      this.score.increment();
-    }
-
-    // Remove destroyed aliens, highest index first.
-    for (const alienIndex of [...aliensToDestroy].sort((a, b) => b - a)) {
-      aliens.splice(alienIndex, 1);
+    // Each hit counts toward the alien's n hits in wave n; one point per
+    // alien a hit removes (ALIEN DESTRUCTION, SCORE INCREMENT).
+    for (const alien of hitAliens) {
+      if (this.formation.hit(alien)) this.score.increment();
     }
 
     // Remove spent projectiles, highest index first.
@@ -182,15 +182,17 @@ export class GameSession {
     }
   }
 
+  /** When the last alien is removed, the next wave starts with a full
+   *  formation in its start position, its aliens needing one more hit
+   *  (WAVE NEXT); score, ship and phase stay. */
+  startNextWaveIfCleared() {
+    if (!this.formation.isEmpty()) return;
+    this.wave += 1;
+    this.formation = this.createFormation();
+  }
+
   checkGameOver() {
     const aliens = this.formation.aliens;
-    if (aliens.length === 0) {
-      // GAME END ALL ALIENS DESTROYED: destroying every alien ends the game;
-      // the end shows as a game over does, so final score, initials and the
-      // session highscore list apply unchanged.
-      this.gameOver();
-      return;
-    }
     if (
       CollisionSystem.checkAlienGround(aliens, this.ship.y) ||
       CollisionSystem.checkAlienShip(aliens, this.ship)
@@ -207,10 +209,12 @@ export class GameSession {
 
   /** Starts a new game session in the state the page loads with: ship
    *  selection, regular ship at its start position, full formation, no
-   *  projectiles, score zero (SESSION START STATE) and an empty session
-   *  highscore list (SESSION HIGHSCORE RESET). Called on page load and by
-   *  the restart (GAME OVER RESTART NEW SESSION). */
+   *  projectiles, score zero (SESSION START STATE) and wave 1 (WAVE FIRST).
+   *  The session highscore list is kept (SESSION HIGHSCORE KEPT ON NEW
+   *  SESSION). Called on page load and by the restart (GAME OVER RESTART NEW
+   *  SESSION). */
   startNewGame() {
+    this.wave = 1;
     this.selectedShipType = 'regular';
     this.ship = new Ship({
       x: this.screenWidth / 2 - SHIP_WIDTH / 2,
@@ -226,7 +230,6 @@ export class GameSession {
       height: PROJECTILE_HEIGHT,
     });
     this.score.reset();
-    this.highscores.clear();
     this.phase = 'ShipSelection';
     this.selectedShipOption = 0;
     this.showHighscoreOverlay = false;
@@ -283,6 +286,7 @@ export class GameSession {
   getState() {
     return createGameState({
       phase: this.phase,
+      wave: this.wave,
       ship: this.ship,
       aliens: this.formation ? this.formation.getPositions() : [],
       projectiles: this.projectiles.getPositions(),

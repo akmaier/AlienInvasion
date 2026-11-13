@@ -7,8 +7,9 @@
 //   GAME OVER CONDITION,
 //   PLAYER SHIP TYPE REGULAR, PLAYER SHIP TYPE SLOW,
 //   PLAYER SHIP SLOW MOVEMENT, PLAYER SHIP SLOW SPECIAL SHOT,
-//   SESSION HIGHSCORE DATA, SESSION HIGHSCORE LIMIT, SESSION HIGHSCORE RESET,
-//   SESSION START STATE.
+//   SESSION HIGHSCORE DATA, SESSION HIGHSCORE LIMIT,
+//   SESSION HIGHSCORE KEPT ON NEW SESSION, SESSION HIGHSCORE KEPT ON RELOAD,
+//   SESSION HIGHSCORE COOKIE STORAGE, SESSION START STATE, WAVE FIRST, WAVE NEXT.
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -21,6 +22,7 @@ import {
   ScoreCounter,
   HighscoreStore,
 } from '../../src/game-logic/index.js';
+import { createCookieJar } from '../helpers/fake_cookie_jar.mjs';
 
 const SCREEN_WIDTH = 800;
 const SCREEN_HEIGHT = 600;
@@ -178,7 +180,7 @@ describe('ProjectileManager (MOD-game-logic; PROJECTILE TRAVEL / PROJECTILE REMO
     pm.spawn(200, 500, 'slow');
     assert.strictEqual(pm.projectiles.length, 2);
     assert.strictEqual(pm.projectiles[0].type, 'regular');
-    assert.strictEqual(pm.projectiles[0].aliensDestroyed, 0);
+    assert.strictEqual(pm.projectiles[0].aliensHit, 0);
     assert.strictEqual(pm.projectiles[1].type, 'special');
     assert.strictEqual(pm.projectiles[1].x, 200);
     assert.strictEqual(pm.projectiles[1].y, 500);
@@ -213,14 +215,14 @@ describe('ProjectileManager (MOD-game-logic; PROJECTILE TRAVEL / PROJECTILE REMO
 
 describe('CollisionSystem (MOD-game-logic; ALIEN DESTRUCTION / SCORE INCREMENT / PLAYER SHIP SLOW SPECIAL SHOT)', () => {
   it('detects bounding-box overlap between a projectile and an alien', () => {
-    const projectiles = [{ x: 110, y: 100, width: 4, height: 10, type: 'regular', aliensDestroyed: 0 }];
+    const projectiles = [{ x: 110, y: 100, width: 4, height: 10, type: 'regular', aliensHit: 0 }];
     const aliens = [{ x: 100, y: 100, width: 40, height: 30 }];
     const collisions = CollisionSystem.checkProjectileAlien(projectiles, aliens);
     assert.deepStrictEqual(collisions, [{ projectileIndex: 0, alienIndex: 0 }]);
   });
 
   it('reports no collision when the projectile misses the alien', () => {
-    const projectiles = [{ x: 300, y: 100, width: 4, height: 10, type: 'regular', aliensDestroyed: 0 }];
+    const projectiles = [{ x: 300, y: 100, width: 4, height: 10, type: 'regular', aliensHit: 0 }];
     const aliens = [{ x: 100, y: 100, width: 40, height: 30 }];
     assert.deepStrictEqual(CollisionSystem.checkProjectileAlien(projectiles, aliens), []);
   });
@@ -260,7 +262,7 @@ describe('ScoreCounter (MOD-game-logic; SCORE INCREMENT)', () => {
   });
 });
 
-describe('HighscoreStore (MOD-game-logic; SESSION HIGHSCORE DATA / SESSION HIGHSCORE LIMIT / SESSION HIGHSCORE RESET)', () => {
+describe('HighscoreStore (MOD-game-logic; SESSION HIGHSCORE DATA / LIMIT / KEPT ON RELOAD / COOKIE STORAGE)', () => {
   it('stores score, initials and a timestamp per entry', () => {
     const store = new HighscoreStore();
     store.addEntry(42, 'ABC', 1000);
@@ -303,11 +305,58 @@ describe('HighscoreStore (MOD-game-logic; SESSION HIGHSCORE DATA / SESSION HIGHS
     assert.strictEqual(store.getEntries().length, 1);
   });
 
-  it('clear empties the list (reset on new session)', () => {
+  it('offers no operation that empties the list', () => {
     const store = new HighscoreStore();
+    assert.strictEqual(typeof store.clear, 'undefined');
+  });
+
+  it('writes the whole list to a cookie after every insertion', () => {
+    const jar = createCookieJar();
+    const store = new HighscoreStore(jar);
+    store.addEntry(42, 'ABC', 1000);
+    store.addEntry(7, 'XYZ', 2000);
+    assert.strictEqual(jar.writes.length, 2);
+    const [pair] = jar.writes[1].split(';');
+    const value = JSON.parse(decodeURIComponent(pair.slice(pair.indexOf('=') + 1)));
+    assert.deepStrictEqual(value, [
+      { score: 42, initials: 'ABC', timestamp: 1000 },
+      { score: 7, initials: 'XYZ', timestamp: 2000 },
+    ]);
+    assert.match(jar.writes[1], /max-age=\d+/);
+    assert.match(jar.writes[1], /path=\//);
+  });
+
+  it('reads the list back from the cookie when created (page reload)', () => {
+    const jar = createCookieJar();
+    const first = new HighscoreStore(jar);
+    first.addEntry(42, 'ABC', 1000);
+    first.addEntry(99, 'TOP', 3000);
+    const reloaded = new HighscoreStore(jar);
+    assert.deepStrictEqual(reloaded.getEntries(), first.getEntries());
+  });
+
+  it('starts empty without a cookie, with an unreadable cookie, or without a document', () => {
+    assert.deepStrictEqual(new HighscoreStore(createCookieJar()).getEntries(), []);
+    const broken = createCookieJar();
+    broken.cookie = 'alieninvasion_highscores=%7Bnot-json';
+    assert.deepStrictEqual(new HighscoreStore(broken).getEntries(), []);
+    const notAList = createCookieJar();
+    notAList.cookie = `alieninvasion_highscores=${encodeURIComponent('{"score":1}')}`;
+    assert.deepStrictEqual(new HighscoreStore(notAList).getEntries(), []);
+    const store = new HighscoreStore(undefined); // plain Node: no document
     store.addEntry(5, 'AAA', 1);
-    store.clear();
-    assert.deepStrictEqual(store.getEntries(), []);
+    assert.strictEqual(store.getEntries().length, 1);
+  });
+
+  it('drops malformed stored entries and applies order and limit on load', () => {
+    const jar = createCookieJar();
+    const stored = [{ score: 1, initials: 'LOW', timestamp: 1 }, { score: 'x', initials: 'BAD', timestamp: 2 },
+      { score: 50, initials: 'MID', timestamp: 3 }, { initials: 'NOS', timestamp: 4 }];
+    for (let i = 0; i < 12; i++) stored.push({ score: 100 + i, initials: 'H' + i, timestamp: 10 + i });
+    jar.cookie = `alieninvasion_highscores=${encodeURIComponent(JSON.stringify(stored))}`;
+    const entries = new HighscoreStore(jar).getEntries();
+    assert.strictEqual(entries.length, 10);
+    assert.deepStrictEqual(entries.map((e) => e.score), [111, 110, 109, 108, 107, 106, 105, 104, 103, 102]);
   });
 });
 
@@ -417,16 +466,39 @@ describe('GameSession (MOD-game-logic; end-to-end simulation per frame)', () => 
     session.update({ left: false, right: false, fire: false, confirm: false, highscoreToggle: false });
     assert.strictEqual(session.score.get(), 2);
     assert.strictEqual(session.getState().projectiles.length, 1);
-    assert.strictEqual(session.projectiles.projectiles[0].aliensDestroyed, 2);
+    assert.strictEqual(session.projectiles.projectiles[0].aliensHit, 2);
 
     // Third hit removes the projectile: aim at a survivor that is still in the formation.
     const target = session.formation.aliens[0];
-    session.projectiles.projectiles.push({ ...base, x: target.x + 10, y: target.y, aliensDestroyed: 2 });
+    session.projectiles.projectiles.push({ ...base, x: target.x + 10, y: target.y, aliensHit: 2 });
     session.update({ left: false, right: false, fire: false, confirm: false, highscoreToggle: false });
     assert.strictEqual(session.score.get(), 3);
     // The first special projectile (two hits) is still flying; only the spent one is removed.
     assert.strictEqual(session.getState().projectiles.length, 1);
-    assert.strictEqual(session.projectiles.projectiles[0].aliensDestroyed, 2);
+    assert.strictEqual(session.projectiles.projectiles[0].aliensHit, 2);
+  });
+
+  it('in wave 2 a special projectile hits three aliens without removing them, then is spent (ARC-006)', () => {
+    const session = newSession();
+    session.navigateShipSelection(1);
+    session.confirmShipSelection();
+    session.formation.speed = 0;
+    session.formation.aliens.splice(1); // reach wave 2: clear the last alien of wave 1
+    const last = session.formation.aliens[0];
+    session.projectiles.spawn(last.x + 10, last.y, 'regular');
+    session.update({ left: false, right: false, fire: false, confirm: false, highscoreToggle: false });
+    assert.strictEqual(session.getState().wave, 2);
+    session.formation.speed = 0;
+    const alien = session.formation.aliens[0];
+    session.formation.aliens.push({ x: alien.x, y: alien.y, width: 40, height: 30 });
+    session.formation.aliens.push({ x: alien.x, y: alien.y, width: 40, height: 30 });
+    const aliensBefore = session.formation.aliens.length;
+    const scoreBefore = session.score.get();
+    session.projectiles.spawn(alien.x + 10, alien.y, 'slow');
+    session.update({ left: false, right: false, fire: false, confirm: false, highscoreToggle: false });
+    assert.strictEqual(session.formation.aliens.length, aliensBefore, 'one hit removes no alien of wave 2');
+    assert.strictEqual(session.score.get(), scoreBefore);
+    assert.strictEqual(session.getState().projectiles.length, 0, 'spent after its third hit');
   });
 
   it('ends the game when an alien reaches the bottom and stops spawning', () => {
@@ -456,7 +528,7 @@ describe('GameSession (MOD-game-logic; end-to-end simulation per frame)', () => 
     assert.strictEqual(session.phase, 'GameOver');
   });
 
-  it('restarts from GameOver into a new session at ShipSelection, clearing the score and the highscores (SESSION HIGHSCORE RESET, SESSION START STATE)', () => {
+  it('restarts from GameOver into a new session at ShipSelection, clearing the score and keeping the highscores (SESSION HIGHSCORE KEPT ON NEW SESSION, SESSION START STATE)', () => {
     const session = newSession();
     session.confirmShipSelection();
     session.formation.speed = 0;
@@ -468,9 +540,40 @@ describe('GameSession (MOD-game-logic; end-to-end simulation per frame)', () => 
     session.confirmShipSelection(); // restart
     assert.strictEqual(session.phase, 'ShipSelection');
     assert.strictEqual(session.score.get(), 0);
-    assert.strictEqual(session.highscores.getEntries().length, 0, 'a new session starts with an empty highscore list');
-    // a fresh session (page reload = new GameSession) starts empty as well
-    assert.strictEqual(newSession().highscores.getEntries().length, 0);
+    assert.strictEqual(session.highscores.getEntries().length, 1, 'a new session keeps the highscore list');
+  });
+
+  it('begins every game session with wave 1 (WAVE FIRST)', () => {
+    const session = newSession();
+    assert.strictEqual(session.getState().wave, 1);
+    session.confirmShipSelection();
+    assert.strictEqual(session.getState().wave, 1);
+    session.formation.speed = 0;
+    session.formation.aliens.splice(1);
+    const last = session.formation.aliens[0];
+    session.projectiles.spawn(last.x + 10, last.y, 'regular');
+    session.update({ left: false, right: false, fire: false, confirm: false, highscoreToggle: false });
+    assert.strictEqual(session.getState().wave, 2);
+    session.startNewGame(); // what the restart button calls
+    assert.strictEqual(session.getState().wave, 1);
+    session.confirmShipSelection();
+    assert.strictEqual(session.formation.hitsToDestroy, 1);
+  });
+
+  it('starts the next wave with a full formation in the start position when the last alien is removed (WAVE NEXT)', () => {
+    const session = newSession();
+    session.confirmShipSelection();
+    const start = session.getState().aliens;
+    session.formation.speed = 0;
+    session.formation.aliens.splice(1);
+    const last = session.formation.aliens[0];
+    session.projectiles.spawn(last.x + 10, last.y, 'regular');
+    const state = session.update({ left: false, right: false, fire: false, confirm: false, highscoreToggle: false });
+    assert.strictEqual(state.phase, 'Playing');
+    assert.strictEqual(state.wave, 2);
+    assert.deepStrictEqual(state.aliens, start);
+    assert.strictEqual(session.formation.hitsToDestroy, 2);
+    assert.strictEqual(state.score, 1);
   });
 
   it('submits initials for the final score on game over', () => {
