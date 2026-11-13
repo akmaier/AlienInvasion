@@ -83,7 +83,7 @@ function baseState({ phase = 'Playing', score = 0, showHighscoreOverlay = false,
       { x: 130, y: 50, width: 40, height: 30 },
     ],
     projectiles: [
-      { x: 398, y: 500, width: 4, height: 10, type: 'regular', aliensDestroyed: 0 },
+      { x: 398, y: 500, width: 4, height: 10, type: 'regular', aliensHit: 0 },
     ],
     score,
     highscores: [
@@ -144,8 +144,8 @@ describe('CanvasRenderer (MOD-rendering; ARC-002 draw order)', () => {
     const ctx = mockContext();
     const renderer = new CanvasRenderer(ctx);
     renderer.drawProjectiles([
-      { x: 398, y: 500, width: 4, height: 10, type: 'regular', aliensDestroyed: 0 },
-      { x: 400, y: 400, width: 4, height: 10, type: 'special', aliensDestroyed: 1 },
+      { x: 398, y: 500, width: 4, height: 10, type: 'regular', aliensHit: 0 },
+      { x: 400, y: 400, width: 4, height: 10, type: 'special', aliensHit: 1 },
     ]);
     assert.deepStrictEqual(ctx.calls, [
       { method: 'fillRect', args: [398, 500, 4, 10] },

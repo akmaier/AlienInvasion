@@ -9,8 +9,8 @@
 //   REGULAR/SLOW, PLAYER SHIP SLOW MOVEMENT, PLAYER SHIP SLOW SPECIAL SHOT,
 //   PLAYER MOVEMENT KEYS, PLAYER FIRE SPACEBAR, PROJECTILE TRAVEL/REMOVAL,
 //   ALIEN DESTRUCTION, SCORE INCREMENT, GAME OVER CONDITION, SCORE DISPLAY,
-//   SESSION HIGHSCORE DATA/LIMIT/DISPLAY GAMEOVER/DISPLAY INGAME/RESET,
-//   SESSION START STATE.
+//   SESSION HIGHSCORE DATA/LIMIT/DISPLAY GAMEOVER/DISPLAY INGAME/KEPT ON NEW SESSION,
+//   SESSION START STATE, WAVE FIRST, WAVE NEXT.
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -161,14 +161,13 @@ describe('System: full playthrough (UC-001 .. UC-008)', () => {
     assert.ok(dom.gameOver.textContent.includes('JMN'));
     assert.ok(dom.gameOver.textContent.includes(String(state.score)));
 
-    // Restart starts a new game session: score and session highscore list
-    // are cleared (SESSION HIGHSCORE RESET, SESSION START STATE)
+    // Restart starts a new game session: score cleared, wave 1, session
+    // highscore list kept (SESSION HIGHSCORE KEPT ON NEW SESSION, SESSION START STATE, WAVE FIRST)
     frame(session, renderer, { ...NOOP, confirm: true });
     assert.strictEqual(session.phase, 'ShipSelection');
     assert.strictEqual(session.score.get(), 0);
-    assert.strictEqual(session.highscores.getEntries().length, 0, 'a new session starts with an empty highscore list');
-    const fresh = createSession({ screenWidth: SCREEN_WIDTH, screenHeight: SCREEN_HEIGHT });
-    assert.strictEqual(fresh.highscores.getEntries().length, 0, 'new page session starts with an empty list');
+    assert.strictEqual(session.getState().wave, 1);
+    assert.strictEqual(session.highscores.getEntries().length, 1, 'a new session keeps the highscore list');
   });
 
   it('plays a full game with the regular ship: standard speed, one alien per shot', () => {
@@ -244,7 +243,7 @@ describe('System: full playthrough (UC-001 .. UC-008)', () => {
     }
   });
 
-  it('session highscore list keeps at most ten entries sorted by score descending and resets on a new session (UC-006)', () => {
+  it('session highscore list keeps at most ten entries sorted by score descending and survives a new session (UC-006)', () => {
     const session = newSession();
     const renderer = createRenderer(mockContext(), newDom());
     selectShip(session, renderer, 'regular');
@@ -263,13 +262,10 @@ describe('System: full playthrough (UC-001 .. UC-008)', () => {
     const entries = session.highscores.getEntries();
     assert.strictEqual(entries.length, 10);
     assert.deepStrictEqual(entries.map((e) => e.score), [100, 90, 80, 70, 60, 55, 50, 40, 35, 30]);
-    // a restart starts a new game session with an empty list, as a fresh
-    // GameSession (a new page) does (SESSION HIGHSCORE RESET)
+    // a restart starts a new game session that keeps the list (SESSION HIGHSCORE KEPT ON NEW SESSION)
     frame(session, renderer, { ...NOOP, confirm: true });
     assert.strictEqual(session.phase, 'ShipSelection');
-    assert.strictEqual(session.highscores.getEntries().length, 0, 'a restart empties the session highscore list');
-    const fresh = createSession({ screenWidth: SCREEN_WIDTH, screenHeight: SCREEN_HEIGHT });
-    assert.strictEqual(fresh.highscores.getEntries().length, 0, 'new page session starts with an empty list');
+    assert.deepStrictEqual(session.highscores.getEntries().map((e) => e.score), [100, 90, 80, 70, 60, 55, 50, 40, 35, 30]);
   });
 
   it('highscore overlay opens and closes in-game (SESSION HIGHSCORE DISPLAY INGAME)', () => {

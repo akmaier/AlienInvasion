@@ -1,8 +1,7 @@
-# SPEC: GAME OVER CONDITION / GAME END ALL ALIENS DESTROYED / GAME OVER RESTART BUTTON /
+# SPEC: GAME OVER CONDITION / GAME OVER RESTART BUTTON /
 #       GAME OVER RESTART BUTTON HIDDEN / GAME OVER RESTART NEW SESSION / SESSION START STATE
 # Modules: MOD-game-logic, MOD-rendering
 # *Check:* tests/integration/test_game_over.py::test_game_over_conditions
-# *Check:* tests/integration/test_game_over.py::test_game_ends_when_all_aliens_destroyed
 # *Check:* tests/integration/test_game_over.py::test_restart_button_shown_on_game_over
 # *Check:* tests/integration/test_game_over.py::test_restart_button_hidden_outside_game_over
 # *Check:* tests/integration/test_game_over.py::test_restart_button_starts_new_session
@@ -69,34 +68,6 @@ process.stdout.write(JSON.stringify({
   spawnsAfterGameOver: (() => { session.update({ ...NOOP, fire: true }); return session.getState().projectiles.length === 0; })(),
 }));
 """
-
-SOURCE_ALL_DESTROYED = r"""
-import { createSession } from './game.js';
-const NOOP = { left: false, right: false, fire: false, confirm: false, highscoreToggle: false };
-const session = createSession({ screenWidth: 800, screenHeight: 600 });
-session.update({ ...NOOP, confirm: true }); // select the regular ship -> Playing
-session.formation.speed = 0; // keep the formation in place
-// Destroy every alien, one regular projectile per alien. After the last one
-// the game must end (GAME END ALL ALIENS DESTROYED).
-while (session.phase === 'Playing' && session.formation.aliens.length > 0) {
-  const alien = session.formation.aliens[0];
-  session.update({ ...NOOP, fire: true }); // spawn one projectile (edge-detected)
-  const projectile = session.projectiles.projectiles[0];
-  projectile.x = alien.x + 10;
-  projectile.y = alien.y; // place it over the alien
-  session.update({ ...NOOP, fire: false }); // step: the projectile hits and destroys the alien
-}
-const state = session.getState();
-process.stdout.write(JSON.stringify({
-  ok: true,
-  phase: state.phase,
-  awaitingInitials: state.awaitingInitials,
-  aliensLeft: session.formation.aliens.length,
-  projectilesLeft: session.getState().projectiles.length,
-  score: state.score,
-}));
-"""
-
 
 # Fake DOM shared by the restart-button drivers: elements record their
 # event listeners, and a click is dispatched with a target whose closest()
@@ -227,17 +198,6 @@ class TestGameOver(unittest.TestCase):
             self.assertTrue(result["spawnsAfterGameOver"],
                             "%s: the game must stop spawning new entities" % label)
 
-    def test_game_ends_when_all_aliens_destroyed(self):
-        result = run_js(SOURCE_ALL_DESTROYED)
-        self.assertTrue(result["ok"], "driver reported failure")
-        self.assertEqual(result["phase"], "GameOver",
-                         "destroying every alien must end the game")
-        self.assertTrue(result["awaitingInitials"],
-                        "the game must await initials after all aliens are destroyed")
-        self.assertEqual(result["aliensLeft"], 0, "no aliens must be left")
-        self.assertEqual(result["projectilesLeft"], 0, "the last projectile must be spent")
-        self.assertEqual(result["score"], 24, "one point per destroyed alien")
-
     def test_restart_button_shown_on_game_over(self):
         result = run_js(SOURCE_BUTTON_SHOWN)
         self.assertTrue(result["ok"], "driver reported failure")
@@ -269,8 +229,8 @@ class TestGameOver(unittest.TestCase):
                          "clicking restart must start a new session at ship selection")
         self.assertTrue(result["shipSelectionShown"], "the ship selection screen must be shown")
         self.assertFalse(result["gameOverShown"], "the game-over screen must be gone")
-        self.assertEqual(result["highscores"], 0,
-                         "a new game session starts with an empty highscore list")
+        self.assertEqual(result["highscores"], 1,
+                         "a new game session keeps the highscore list")
         self.assertEqual(result["score"], 0, "a new game session starts with score zero")
 
     def test_new_session_start_state(self):

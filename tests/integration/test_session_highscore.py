@@ -1,20 +1,28 @@
-# SPEC: SESSION HIGHSCORE DATA / LIMIT / DISPLAY GAMEOVER / DISPLAY INGAME / RESET
+# SPEC: SESSION HIGHSCORE DATA / LIMIT / DISPLAY GAMEOVER / DISPLAY INGAME / DISPLAY ENTRIES /
+#       KEPT ON NEW SESSION / KEPT ON RELOAD / COOKIE STORAGE
+# Modules: MOD-game-logic, MOD-rendering
 # *Check:* tests/integration/test_session_highscore.py::test_highscore_entry_data
 # *Check:* tests/integration/test_session_highscore.py::test_highscore_limit_and_order
 # *Check:* tests/integration/test_session_highscore.py::test_highscore_display_gameover
 # *Check:* tests/integration/test_session_highscore.py::test_highscore_access_ingame
-# *Check:* tests/integration/test_session_highscore.py::test_highscore_reset_on_new_session
+# *Check:* tests/integration/test_session_highscore.py::test_highscore_display_entries
+# *Check:* tests/integration/test_session_highscore.py::test_highscore_kept_on_new_session
+# *Check:* tests/integration/test_session_highscore.py::test_highscore_kept_on_reload
+# *Check:* tests/integration/test_session_highscore.py::test_highscore_stored_in_cookie
 # Test level: system
 #
-# Drives the real game code through Node: GameSession owns a HighscoreStore
-# (one per page session), entries hold score/initials/timestamp, the list is
-# capped at ten sorted by score descending, the GameOver screen shows it, it is
-# reachable in-game via 'H', and a new game session - a restart from the
-# game-over screen, as a fresh page does - starts with an empty list.
+# Drives the real game code through Node: GameSession owns a HighscoreStore,
+# entries hold score/initials/timestamp, the list is capped at ten sorted by
+# score descending, the GameOver screen and the in-game 'H' overlay show every
+# entry's initials and score, a restart by the button keeps the list, and the
+# list is written to a cookie of the page (a stand-in for document.cookie,
+# tests/helpers/fake_cookie_jar.mjs) from which a reloaded page reads it back.
 import json
 import subprocess
 import unittest
 from pathlib import Path
+
+from .test_game_over import FAKE_DOM
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -132,29 +140,90 @@ const closed = dom.highscoreOverlay.classList.contains('show');
 process.stdout.write(JSON.stringify({ ok: true, open: open, openText: openText, closed: closed, closedText: closedText }));
 """
 
-SOURCE_RESET = r"""
-import { createSession } from './game.js';
+SOURCE_DISPLAY_ENTRIES = r"""
+import { createSession, createRenderer } from './game.js';
+function element() {
+  const e = { style: {}, classList: { _: new Set(), add(...c) { c.forEach((x) => this._.add(x)); },
+            remove(...c) { c.forEach((x) => this._.delete(x)); },
+            contains(c) { return this._.has(c); } }, value: '', _html: '', _text: '',
+    addEventListener() {}, setAttribute() {}, getAttribute() { return null; },
+    querySelector() { return null; }, querySelectorAll() { return []; } };
+  Object.defineProperty(e, 'textContent', { get() { return this._text; }, set(v) { this._text = String(v); } });
+  Object.defineProperty(e, 'innerHTML', { get() { return this._html; },
+    set(v) { this._html = String(v); this._text = String(v).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(); } });
+  return e;
+}
+const ctx = { canvas: { width: 800, height: 600 }, clearRect() {}, fillRect() {}, fillText() {},
+              beginPath() {}, moveTo() {}, lineTo() {}, closePath() {}, fill() {}, fillStyle: null };
+const dom = { score: element(), gameOver: element(), highscoreOverlay: element(),
+              initialsPrompt: element(), shipSelection: element() };
+const renderer = createRenderer(ctx, dom);
 const NOOP = { left: false, right: false, fire: false, confirm: false, highscoreToggle: false };
 const session = createSession({ screenWidth: 800, screenHeight: 600 });
-session.update({ ...NOOP, right: true, confirm: true }); // Playing
+session.update({ ...NOOP, confirm: true }); // Playing
+const entries = [[731, 'ABC'], [512, 'KLM'], [97, 'XYZ']];
+let ts = 1000;
+for (const [score, initials] of entries) {
+  session.finalScore = score;
+  session.submitInitials(initials, ts++);
+}
+session.toggleHighscoreOverlay(); // open with 'H' during play
+renderer.render(session.update(NOOP));
+const ingame = dom.highscoreOverlay.textContent;
+session.toggleHighscoreOverlay();
 session.formation.speed = 0;
-session.formation.aliens[0].y = session.ship.y - session.formation.aliens[0].height;
-session.update({ ...NOOP, fire: false }); // GameOver, awaiting initials
-session.submitInitials('CLA', 1000); // keep one entry
-const keptBeforeRestart = session.highscores.getEntries().length;
-// Restart: a new game session (GAME OVER RESTART NEW SESSION) empties the list.
+session.formation.aliens[0].y = session.ship.y - session.formation.aliens[0].height; // game over
+renderer.render(session.update(NOOP));
+const gameover = dom.gameOver.textContent;
+process.stdout.write(JSON.stringify({ ok: true, entries, ingame, gameover }));
+"""
+
+SOURCE_KEPT_ON_NEW_SESSION = FAKE_DOM + r"""
+step({ confirm: true }); // Playing
+endGame();
+session.submitInitials('KEP', 1000);
+step({});
+const before = session.highscores.getEntries();
+const clicked = clickRestartButton(dom.gameOver);
+const state = step({});
+process.stdout.write(JSON.stringify({ ok: true, clicked, before, phase: state.phase,
+  after: state.highscores }));
+"""
+
+COOKIE_GAME = r"""
+import { createSession } from './game.js';
+import { createCookieJar } from './tests/helpers/fake_cookie_jar.mjs';
+const NOOP = { left: false, right: false, fire: false, confirm: false, highscoreToggle: false };
+const jar = createCookieJar();
+globalThis.document = jar; // the page's document.cookie
+function playOneGame(session, initials, timestamp) {
+  session.update({ ...NOOP, confirm: true }); // Playing
+  session.formation.speed = 0;
+  session.formation.aliens[0].y = session.ship.y - session.formation.aliens[0].height;
+  session.update(NOOP); // GameOver
+  session.submitInitials(initials, timestamp);
+}
+"""
+
+SOURCE_KEPT_ON_RELOAD = COOKIE_GAME + r"""
+const first = createSession({ screenWidth: 800, screenHeight: 600 }); // page load
+playOneGame(first, 'REL', 1000);
+const before = first.highscores.getEntries();
+const reloaded = createSession({ screenWidth: 800, screenHeight: 600 }); // page reloaded
+process.stdout.write(JSON.stringify({ ok: true, before, after: reloaded.getState().highscores }));
+"""
+
+SOURCE_STORED_IN_COOKIE = COOKIE_GAME + r"""
+const session = createSession({ screenWidth: 800, screenHeight: 600 });
 session.update({ ...NOOP, confirm: true });
-const afterRestart = session.highscores.getEntries().length;
-// A new page session starts with a fresh, empty store.
-const fresh = createSession({ screenWidth: 800, screenHeight: 600 });
-const freshStart = fresh.highscores.getEntries().length;
-process.stdout.write(JSON.stringify({
-  ok: true,
-  keptBeforeRestart: keptBeforeRestart,
-  phaseAfterRestart: session.getState().phase,
-  afterRestart: afterRestart,
-  freshStart: freshStart,
-}));
+session.finalScore = 77;
+session.submitInitials('CKE', 4242);
+const stored = [];
+for (const pair of jar.cookie.split('; ').filter(Boolean)) {
+  const value = pair.slice(pair.indexOf('=') + 1);
+  try { stored.push(JSON.parse(decodeURIComponent(value))); } catch (e) { stored.push(null); }
+}
+process.stdout.write(JSON.stringify({ ok: true, cookie: jar.cookie, stored }));
 """
 
 
@@ -189,18 +258,38 @@ class TestSessionHighscore(unittest.TestCase):
                       "the overlay shows the stored entries: %r" % (result["openText"],))
         self.assertFalse(result["closed"], "the overlay can be closed again")
 
-    def test_highscore_reset_on_new_session(self):
-        result = run_js(SOURCE_RESET)
+    def test_highscore_display_entries(self):
+        result = run_js(SOURCE_DISPLAY_ENTRIES)
         self.assertTrue(result["ok"], "driver reported failure")
-        self.assertEqual(result["keptBeforeRestart"], 1,
-                         "the entry must exist before the restart")
-        self.assertEqual(result["phaseAfterRestart"], "ShipSelection",
-                         "a restart returns to ship selection")
-        self.assertEqual(result["afterRestart"], 0,
-                         "a restart starts a new game session with an empty highscore list")
-        self.assertEqual(result["freshStart"], 0,
-                         "a new page session starts with an empty highscore list")
+        for where in ("gameover", "ingame"):
+            for score, initials in result["entries"]:
+                self.assertIn(initials, result[where],
+                              "%s list shows the initials %s: %r" % (where, initials, result[where]))
+                self.assertIn(str(score), result[where],
+                              "%s list shows the score %d: %r" % (where, score, result[where]))
 
+    def test_highscore_kept_on_new_session(self):
+        result = run_js(SOURCE_KEPT_ON_NEW_SESSION)
+        self.assertTrue(result["ok"], "driver reported failure")
+        self.assertEqual(len(result["before"]), 1, "the entry must exist before the restart")
+        self.assertTrue(result["clicked"], "the game-over screen must hold a restart button")
+        self.assertEqual(result["phase"], "ShipSelection", "the restart starts a new game session")
+        self.assertEqual(result["after"], result["before"],
+                         "the new game session keeps the highscore list")
+
+    def test_highscore_kept_on_reload(self):
+        result = run_js(SOURCE_KEPT_ON_RELOAD)
+        self.assertTrue(result["ok"], "driver reported failure")
+        self.assertEqual(len(result["before"]), 1, "the entry must exist before the reload")
+        self.assertEqual(result["after"], result["before"],
+                         "the reloaded page holds the same highscore list")
+
+    def test_highscore_stored_in_cookie(self):
+        result = run_js(SOURCE_STORED_IN_COOKIE)
+        self.assertTrue(result["ok"], "driver reported failure")
+        entry = {"score": 77, "initials": "CKE", "timestamp": 4242}
+        self.assertTrue(any(isinstance(v, list) and entry in v for v in result["stored"]),
+                        "a cookie of the page holds the entry: %r" % (result["cookie"],))
 
 if __name__ == '__main__':
     unittest.main()
