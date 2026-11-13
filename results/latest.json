@@ -1,16 +1,16 @@
 {
   "workflow": "Agent M tests",
   "product": "akmaier/AlienInvasion",
-  "run_id": "43424132933",
+  "run_id": "43426449038",
   "run_attempt": "1",
-  "commit": "ab59f71dc2ef166b0ccfd5f4593490675852d7ef",
+  "commit": "710799b2cd1ff5e1af982e005b7253f6347cbe12",
   "ref": "refs/heads/main",
-  "ran_at": "2026-11-13T12:19:15.066Z",
+  "ran_at": "2026-11-13T12:35:31.566Z",
   "exit_code": 0,
   "summary": {
     "suites": 19,
-    "tests": 126,
-    "passed": 126,
+    "tests": 130,
+    "passed": 130,
     "failed": 0
   },
   "runner": {
@@ -21,7 +21,7 @@
       "exit": 0
     },
     "python": {
-      "ran": "22",
+      "ran": "26",
       "ok": true,
       "exit": 0
     }
@@ -35,8 +35,8 @@
     },
     "system": {
       "files": 8,
-      "tests": 34,
-      "passed": 34,
+      "tests": 38,
+      "passed": 38,
       "failed": 0
     },
     "release": {
@@ -221,9 +221,11 @@
     },
     {
       "name": "GAME OVER RESTART BUTTON",
-      "guarded_by": [],
+      "guarded_by": [
+        "tests/integration/test_game_over.py"
+      ],
       "guarded_by_review": [],
-      "passing": false
+      "passing": true
     },
     {
       "name": "GAME OVER RESTART BUTTON HIDDEN",
@@ -239,9 +241,12 @@
     },
     {
       "name": "SESSION START STATE",
-      "guarded_by": [],
+      "guarded_by": [
+        "tests/system/test_playthrough.js",
+        "tests/unit/test_game_logic.js"
+      ],
       "guarded_by_review": [],
-      "passing": false
+      "passing": true
     },
     {
       "name": "SCORE DISPLAY",
@@ -348,12 +353,13 @@
       "file": "tests/integration/test_game_over.py",
       "language": "python",
       "level": "system",
-      "tests": 2,
+      "tests": 6,
       "passed": true,
       "executable": true,
       "guards": [
         "GAME OVER CONDITION",
-        "GAME END ALL ALIENS DESTROYED"
+        "GAME END ALL ALIENS DESTROYED",
+        "GAME OVER RESTART BUTTON"
       ]
     },
     {
@@ -467,6 +473,7 @@
         "ALIEN DESTRUCTION",
         "SCORE INCREMENT",
         "GAME OVER CONDITION",
+        "SESSION START STATE",
         "SCORE DISPLAY",
         "SESSION HIGHSCORE DATA"
       ]
@@ -502,6 +509,7 @@
         "ALIEN DESTRUCTION",
         "SCORE INCREMENT",
         "GAME OVER CONDITION",
+        "SESSION START STATE",
         "SESSION HIGHSCORE DATA",
         "SESSION HIGHSCORE LIMIT",
         "SESSION HIGHSCORE RESET"
