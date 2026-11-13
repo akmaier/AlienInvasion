@@ -5,3 +5,4 @@ Append-only.
 | 2026-11-09 12:30 UTC | 3 | uebernommen | approval:spec-requirements-03-f205890d7828.md |
 | 2026-11-10 06:23 UTC | 4 | uebernommen | approval:spec-requirements-04-8139f1ac5001.md |
 | 2026-11-12 17:20 UTC | 5 | uebernommen | approval:spec-requirements-05-7654e5715869.md |
+| 2026-11-13 12:18 UTC | 6 | uebernommen | approval:spec-requirements-06-6301c92a9a8f.md |

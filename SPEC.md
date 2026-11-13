@@ -80,6 +80,22 @@ The game shall end when any alien reaches the bottom of the screen or collides w
 The game shall end when every alien has been destroyed.
 *Check:* `tests/integration/test_game_over.py::test_game_ends_when_all_aliens_destroyed` destroys every alien of the formation and verifies that the game switches to the Game‑Over state.
 
+**GAME OVER RESTART BUTTON** *(github.com/akmaier)*
+While the game is in the Game‑Over state, the game‑over screen shall display a restart button.
+*Check:* `tests/integration/test_game_over.py::test_restart_button_shown_on_game_over` ends a game and verifies that the game‑over screen shows a visible restart button.
+
+**GAME OVER RESTART BUTTON HIDDEN** *(github.com/akmaier)*
+While the game is not in the Game‑Over state, no restart button shall be visible.
+*Check:* `tests/integration/test_game_over.py::test_restart_button_hidden_outside_game_over` verifies that no restart button is visible on the ship selection screen or during gameplay.
+
+**GAME OVER RESTART NEW SESSION** *(github.com/akmaier)*
+When the player clicks the restart button, the game shall start a new game session.
+*Check:* `tests/integration/test_game_over.py::test_restart_button_starts_new_session` clicks the restart button on the game‑over screen and verifies that a new game session starts with the ship selection screen.
+
+**SESSION START STATE** *(github.com/akmaier)*
+When a new game session starts, the score, the alien formation and the player's ship shall be in the same state as at the start of the first game session after the page is loaded.
+*Check:* `tests/integration/test_game_over.py::test_new_session_start_state` restarts after a game in which the score, the formation and the ship have changed, and verifies that all three equal their state on a freshly loaded page.
+
 **SCORE DISPLAY** *(github.com/akmaier)*
 The current score shall be displayed prominently on the screen during gameplay.
 *Check:* `tests/unit/test_ui.py::test_score_display` inspects the DOM during play and verifies that a visible element shows the numeric score and updates after each alien destruction.
