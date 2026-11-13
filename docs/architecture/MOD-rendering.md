@@ -6,6 +6,8 @@ realises:
   - SCORE DISPLAY
   - SESSION HIGHSCORE DISPLAY GAMEOVER
   - SESSION HIGHSCORE DISPLAY INGAME
+  - GAME OVER RESTART BUTTON
+  - GAME OVER RESTART BUTTON HIDDEN
   - IMPLEMENTATION JAVASCRIPT WEB
   - PLAYER SHIP SELECTION
   - PLAYER SHIP TYPE REGULAR
@@ -32,7 +34,7 @@ Draw the current `GameState` to an HTML `<canvas>` and manage DOM overlays for s
 
 - `CanvasRenderer` — Draws ship, aliens, projectiles to canvas each frame. **Renders ship with type-appropriate visuals (regular vs slow).**
 - `ScoreDisplay` — Updates a DOM element with the current score.
-- `GameOverScreen` — Shows/hides the game-over overlay with final score and highscore list.
+- `GameOverScreen` — Shows/hides the game-over overlay with final score, highscore list and restart button; the button exists only while the overlay is shown.
 - `HighscoreOverlay` — Shows/hides the in-game highscore list overlay (triggered by 'H' key).
 - `InitialsPrompt` — Prompts for player initials when a new highscore qualifies.
 - `ShipSelectionScreen` — **Renders the ship selection UI showing available ship types with their characteristics, highlights the currently selected option.**
@@ -54,10 +56,11 @@ interface Renderer {
   showInitialsPrompt(callback: (initials: string) => void): void;
   submitInitials(): void;
   hideInitialsPrompt(): void;
+  onRestart(callback: () => void): void;
 }
 ```
 
-The Game Logic Layer (via the main entry point) calls `render(state)` each frame. When `GameState.awaitingInitials` is true, the entry point calls `showInitialsPrompt` with a callback that forwards initials to `GameSession.submitInitials()`. **When `GameState.phase === 'ShipSelection'`, the `ShipSelectionScreen` renders the selection UI using `shipSelectionOptions` and `selectedShipOption`.**
+The Game Logic Layer (via the main entry point) calls `render(state)` each frame. When `GameState.awaitingInitials` is true, the entry point calls `showInitialsPrompt` with a callback that forwards initials to `GameSession.submitInitials()`. Once at start-up, the entry point calls `onRestart` with a callback that runs `GameSession.startNewGame()`; the click listener sits on the game-over overlay, and the overlay's markup is rewritten only when it changes, so the button stays clickable between frames. **When `GameState.phase === 'ShipSelection'`, the `ShipSelectionScreen` renders the selection UI using `shipSelectionOptions` and `selectedShipOption`.**
 
 ## Files
 
@@ -87,6 +90,7 @@ classDiagram
         +showInitialsPrompt(callback: (initials: string) => void): void
         +submitInitials(): void
         +hideInitialsPrompt(): void
+        +onRestart(callback): void
     }
     class CanvasRenderer {
         -ctx: CanvasRenderingContext2D
@@ -104,6 +108,7 @@ classDiagram
         -highscoreElement: HTMLElement
         +show(finalScore, highscores): void
         +hide(): void
+        +onRestart(callback): void
     }
     class HighscoreOverlay {
         -element: HTMLElement

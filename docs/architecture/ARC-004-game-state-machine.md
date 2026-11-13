@@ -18,6 +18,8 @@ forced_by:
   - SESSION HIGHSCORE DISPLAY GAMEOVER
   - SESSION HIGHSCORE DISPLAY INGAME
   - SESSION HIGHSCORE RESET
+  - GAME OVER RESTART NEW SESSION
+  - SESSION START STATE
   - PLAYER SHIP SELECTION
   - PLAYER SHIP TYPE REGULAR
   - PLAYER SHIP TYPE SLOW
@@ -70,7 +72,7 @@ A **simple three-state machine** implemented as a string variable `gameState` wi
 - **GameOver state**:
   - Game loop stops updating entities (no movement, no spawning)
   - Render shows final frame + game-over text + highscore list
-  - Input only accepts new-session trigger (e.g., Enter/Space to restart)
+  - Input only accepts the new-session trigger: the restart button on the game-over screen, or Enter/Space once the initials are submitted
   - Session highscore list displayed automatically
 
 - **Transition ShipSelection → Playing**: when player confirms a ship selection; `initializeGame(selectedShipType)` called which:
@@ -80,14 +82,11 @@ A **simple three-state machine** implemented as a string variable `gameState` wi
 
 - **Transition Playing → GameOver**: when any alien's y-position ≥ ship y-position OR alien bounding box intersects ship bounding box (UC-004).
 
-- **Transition GameOver → ShipSelection**: player presses restart key; `startNewGame()` called which:
-  - Clears all entities
+- **Transition GameOver → ShipSelection**: player clicks the restart button (or presses the restart key); `startNewGame()` called, which starts a new game session in the state the page loads with — the constructor calls the same method (SESSION START STATE):
+  - Regular ship at its start position, full alien formation, no projectiles
   - Resets score to 0
-  - Keeps the session highscore list: the session is the page's session (it
-    starts when the page is loaded), so a restart starts a new game in the
-    same session and keeps the list. SESSION HIGHSCORE RESET resets the list
-    only on a new page session (UC-006).
-  - Sets phase to 'ShipSelection' (new game in the same session)
+  - Empties the session highscore list (SESSION HIGHSCORE RESET)
+  - Sets phase to 'ShipSelection' (new game session)
 
 No pause state, no menu state, no level transition — YAGNI.
 
@@ -106,11 +105,11 @@ No pause state, no menu state, no level transition — YAGNI.
 
 ```mermaid
 stateDiagram-v2
-    [*] --> ShipSelection: startNewGame() (new page session: empty list)
+    [*] --> ShipSelection: startNewGame() (page load: new game session)
     ShipSelection --> Playing: ship selected (initializeGame())
     Playing --> GameOver: alien reaches bottom
     Playing --> GameOver: alien collides with ship
-    GameOver --> ShipSelection: player restarts (resetGame())
+    GameOver --> ShipSelection: restart button / restart key (startNewGame(): new game session)
     GameOver --> [*]: page unload
 
     state ShipSelection {

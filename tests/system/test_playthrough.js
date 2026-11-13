@@ -9,7 +9,8 @@
 //   REGULAR/SLOW, PLAYER SHIP SLOW MOVEMENT, PLAYER SHIP SLOW SPECIAL SHOT,
 //   PLAYER MOVEMENT KEYS, PLAYER FIRE SPACEBAR, PROJECTILE TRAVEL/REMOVAL,
 //   ALIEN DESTRUCTION, SCORE INCREMENT, GAME OVER CONDITION, SCORE DISPLAY,
-//   SESSION HIGHSCORE DATA/LIMIT/DISPLAY GAMEOVER/DISPLAY INGAME/RESET.
+//   SESSION HIGHSCORE DATA/LIMIT/DISPLAY GAMEOVER/DISPLAY INGAME/RESET,
+//   SESSION START STATE.
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -160,13 +161,12 @@ describe('System: full playthrough (UC-001 .. UC-008)', () => {
     assert.ok(dom.gameOver.textContent.includes('JMN'));
     assert.ok(dom.gameOver.textContent.includes(String(state.score)));
 
-    // Restart clears the score but keeps the session highscore list (the
-    // session is the page's session; SESSION HIGHSCORE RESET resets only on a
-    // new page session)
+    // Restart starts a new game session: score and session highscore list
+    // are cleared (SESSION HIGHSCORE RESET, SESSION START STATE)
     frame(session, renderer, { ...NOOP, confirm: true });
     assert.strictEqual(session.phase, 'ShipSelection');
     assert.strictEqual(session.score.get(), 0);
-    assert.strictEqual(session.highscores.getEntries().length, 1, 'restart keeps the highscore entry');
+    assert.strictEqual(session.highscores.getEntries().length, 0, 'a new session starts with an empty highscore list');
     const fresh = createSession({ screenWidth: SCREEN_WIDTH, screenHeight: SCREEN_HEIGHT });
     assert.strictEqual(fresh.highscores.getEntries().length, 0, 'new page session starts with an empty list');
   });
@@ -263,11 +263,11 @@ describe('System: full playthrough (UC-001 .. UC-008)', () => {
     const entries = session.highscores.getEntries();
     assert.strictEqual(entries.length, 10);
     assert.deepStrictEqual(entries.map((e) => e.score), [100, 90, 80, 70, 60, 55, 50, 40, 35, 30]);
-    // a restart keeps the list (same page session); a fresh GameSession,
-    // i.e. a new page session, starts with an empty list (SESSION HIGHSCORE RESET)
+    // a restart starts a new game session with an empty list, as a fresh
+    // GameSession (a new page) does (SESSION HIGHSCORE RESET)
     frame(session, renderer, { ...NOOP, confirm: true });
     assert.strictEqual(session.phase, 'ShipSelection');
-    assert.strictEqual(session.highscores.getEntries().length, 10, 'restart keeps the session highscore list');
+    assert.strictEqual(session.highscores.getEntries().length, 0, 'a restart empties the session highscore list');
     const fresh = createSession({ screenWidth: SCREEN_WIDTH, screenHeight: SCREEN_HEIGHT });
     assert.strictEqual(fresh.highscores.getEntries().length, 0, 'new page session starts with an empty list');
   });

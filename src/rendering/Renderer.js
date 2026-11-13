@@ -30,20 +30,30 @@ export class Renderer {
     this.canvasRenderer.drawProjectiles(state.projectiles);
     this.scoreDisplay.update(state.score);
 
-    this.hideAllOverlays();
+    // Each overlay is shown in its phase and hidden otherwise; the game-over
+    // screen is not hidden and re-shown within one frame, so its restart
+    // button stays the same element between frames.
     if (state.phase === 'ShipSelection') {
       this.shipSelectionScreen.render(state.shipSelectionOptions, state.selectedShipOption);
       this.shipSelectionScreen.show();
     } else {
       this.shipSelectionScreen.hide();
-      if (state.phase === 'GameOver') {
-        this.gameOverScreen.show(state.score, state.highscores);
-      } else if (state.showHighscoreOverlay) {
-        this.highscoreOverlay.show(state.highscores);
-      } else {
-        this.highscoreOverlay.hide();
-      }
     }
+    if (state.phase === 'GameOver') {
+      this.gameOverScreen.show(state.score, state.highscores);
+    } else {
+      this.gameOverScreen.hide();
+    }
+    if (state.phase === 'Playing' && state.showHighscoreOverlay) {
+      this.highscoreOverlay.show(state.highscores);
+    } else {
+      this.highscoreOverlay.hide();
+    }
+  }
+
+  /** @param {() => void} callback - run when the restart button is clicked */
+  onRestart(callback) {
+    this.gameOverScreen.onRestart(callback);
   }
 
   /** @param {(initials: string) => void} callback */

@@ -569,14 +569,12 @@ describe('Full playthrough visibility on the real page (MOD-rendering + MOD-game
     renderer.render(session.getState());
     assert.ok(dom.gameOver.textContent.includes('JMN'), 'highscore entry visible on game-over screen');
 
-    // 8. Restart -> ShipSelection again: score cleared, highscores kept (the
-    // session is the page's session; SESSION HIGHSCORE RESET resets only on a
-    // new page session)
+    // 8. Restart -> ShipSelection of a new game session: score and
+    // highscores cleared (SESSION HIGHSCORE RESET)
     state = step({ ...idle(), confirm: true });
     assert.strictEqual(state.phase, 'ShipSelection');
     assert.strictEqual(state.score, 0, 'score cleared on restart');
-    assert.strictEqual(state.highscores.length, 1, 'highscores kept across restart');
-    assert.strictEqual(state.highscores[0].initials, 'JMN', 'the submitted entry survives the restart');
+    assert.strictEqual(state.highscores.length, 0, 'highscores cleared by the new session');
     assertSelectedHighlighted(dom, 0);
     assert.strictEqual(computedDisplay(dom.shipSelection, RULES), 'block', 'ship selection screen is displayed after restart');
     assert.strictEqual(computedDisplay(dom.gameOver, RULES), 'none');
