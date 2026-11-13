@@ -1,11 +1,11 @@
 {
   "workflow": "Agent M tests",
   "product": "akmaier/AlienInvasion",
-  "run_id": "43446160161",
+  "run_id": "43449979581",
   "run_attempt": "1",
-  "commit": "389f004736e63d5eec97ff779813ca959e3580f1",
+  "commit": "4a0627f1146f6981302970b0d449fc643c0d1a57",
   "ref": "refs/heads/main",
-  "ran_at": "2026-11-13T14:48:01.129Z",
+  "ran_at": "2026-11-13T15:11:04.547Z",
   "exit_code": 0,
   "summary": {
     "suites": 19,
@@ -212,12 +212,16 @@
       "passing": true
     },
     {
-      "name": "GAME END ALL ALIENS DESTROYED",
-      "guarded_by": [
-        "tests/integration/test_game_over.py"
-      ],
+      "name": "WAVE FIRST",
+      "guarded_by": [],
       "guarded_by_review": [],
-      "passing": true
+      "passing": false
+    },
+    {
+      "name": "WAVE NEXT",
+      "guarded_by": [],
+      "guarded_by_review": [],
+      "passing": false
     },
     {
       "name": "GAME OVER RESTART BUTTON",
@@ -316,13 +320,28 @@
       "passing": true
     },
     {
-      "name": "SESSION HIGHSCORE RESET",
-      "guarded_by": [
-        "tests/integration/test_session_highscore.py",
-        "tests/unit/test_game_logic.js"
-      ],
+      "name": "SESSION HIGHSCORE DISPLAY ENTRIES",
+      "guarded_by": [],
       "guarded_by_review": [],
-      "passing": true
+      "passing": false
+    },
+    {
+      "name": "SESSION HIGHSCORE KEPT ON NEW SESSION",
+      "guarded_by": [],
+      "guarded_by_review": [],
+      "passing": false
+    },
+    {
+      "name": "SESSION HIGHSCORE KEPT ON RELOAD",
+      "guarded_by": [],
+      "guarded_by_review": [],
+      "passing": false
+    },
+    {
+      "name": "SESSION HIGHSCORE COOKIE STORAGE",
+      "guarded_by": [],
+      "guarded_by_review": [],
+      "passing": false
     }
   ],
   "files": [
@@ -358,7 +377,6 @@
       "executable": true,
       "guards": [
         "GAME OVER CONDITION",
-        "GAME END ALL ALIENS DESTROYED",
         "GAME OVER RESTART BUTTON"
       ]
     },
@@ -511,8 +529,7 @@
         "GAME OVER CONDITION",
         "SESSION START STATE",
         "SESSION HIGHSCORE DATA",
-        "SESSION HIGHSCORE LIMIT",
-        "SESSION HIGHSCORE RESET"
+        "SESSION HIGHSCORE LIMIT"
       ]
     },
     {
