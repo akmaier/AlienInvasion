@@ -1,11 +1,11 @@
 {
   "workflow": "Agent M tests",
   "product": "akmaier/AlienInvasion",
-  "run_id": "43421703170",
+  "run_id": "43424132933",
   "run_attempt": "1",
-  "commit": "65d217aa2f999495b20ae94aa533d9a870683d26",
+  "commit": "ab59f71dc2ef166b0ccfd5f4593490675852d7ef",
   "ref": "refs/heads/main",
-  "ran_at": "2026-11-13T12:01:39.214Z",
+  "ran_at": "2026-11-13T12:19:15.066Z",
   "exit_code": 0,
   "summary": {
     "suites": 19,
@@ -218,6 +218,30 @@
       ],
       "guarded_by_review": [],
       "passing": true
+    },
+    {
+      "name": "GAME OVER RESTART BUTTON",
+      "guarded_by": [],
+      "guarded_by_review": [],
+      "passing": false
+    },
+    {
+      "name": "GAME OVER RESTART BUTTON HIDDEN",
+      "guarded_by": [],
+      "guarded_by_review": [],
+      "passing": false
+    },
+    {
+      "name": "GAME OVER RESTART NEW SESSION",
+      "guarded_by": [],
+      "guarded_by_review": [],
+      "passing": false
+    },
+    {
+      "name": "SESSION START STATE",
+      "guarded_by": [],
+      "guarded_by_review": [],
+      "passing": false
     },
     {
       "name": "SCORE DISPLAY",
