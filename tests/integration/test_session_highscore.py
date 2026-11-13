@@ -217,13 +217,14 @@ SOURCE_STORED_IN_COOKIE = COOKIE_GAME + r"""
 const session = createSession({ screenWidth: 800, screenHeight: 600 });
 session.update({ ...NOOP, confirm: true });
 session.finalScore = 77;
-session.submitInitials('CKE', 4242);
+session.submitInitials('CKE');
+const entry = session.highscores.getEntries()[0];
 const stored = [];
 for (const pair of jar.cookie.split('; ').filter(Boolean)) {
   const value = pair.slice(pair.indexOf('=') + 1);
   try { stored.push(JSON.parse(decodeURIComponent(value))); } catch (e) { stored.push(null); }
 }
-process.stdout.write(JSON.stringify({ ok: true, cookie: jar.cookie, stored }));
+process.stdout.write(JSON.stringify({ ok: true, cookie: jar.cookie, entry, stored }));
 """
 
 
@@ -287,7 +288,9 @@ class TestSessionHighscore(unittest.TestCase):
     def test_highscore_stored_in_cookie(self):
         result = run_js(SOURCE_STORED_IN_COOKIE)
         self.assertTrue(result["ok"], "driver reported failure")
-        entry = {"score": 77, "initials": "CKE", "timestamp": 4242}
+        entry = result["entry"]
+        self.assertEqual((entry["score"], entry["initials"]), (77, "CKE"), "the game stored the entry")
+        self.assertIsInstance(entry["timestamp"], int)
         self.assertTrue(any(isinstance(v, list) and entry in v for v in result["stored"]),
                         "a cookie of the page holds the entry: %r" % (result["cookie"],))
 

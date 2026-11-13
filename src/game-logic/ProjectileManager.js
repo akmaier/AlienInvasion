@@ -3,7 +3,7 @@
  *
  * All projectiles travel upward at constant speed. A projectile carries a type
  * ('regular' or 'special'); special projectiles (slow ship) count the aliens
- * they destroyed and are removed after the third hit (ARC-006).
+ * they hit and are removed after the third hit (ARC-006).
  */
 export class ProjectileManager {
   /**
@@ -16,7 +16,7 @@ export class ProjectileManager {
     this.speed = speed;
     this.width = width;
     this.height = height;
-    /** @type {Array<{x:number,y:number,width:number,height:number,speed:number,type:'regular'|'special',aliensDestroyed:number}>} */
+    /** @type {Array<{x:number,y:number,width:number,height:number,speed:number,type:'regular'|'special',aliensHit:number}>} */
     this.projectiles = [];
   }
 
@@ -35,7 +35,7 @@ export class ProjectileManager {
       height: this.height,
       speed: this.speed,
       type: shipType === 'slow' ? 'special' : 'regular',
-      aliensDestroyed: 0,
+      aliensHit: 0,
     });
   }
 
@@ -55,7 +55,7 @@ export class ProjectileManager {
       width: p.width,
       height: p.height,
       type: p.type,
-      aliensDestroyed: p.aliensDestroyed,
+      aliensHit: p.aliensHit,
     }));
   }
 }

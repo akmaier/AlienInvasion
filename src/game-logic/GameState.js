@@ -4,9 +4,10 @@
  *
  * @typedef {object} GameState
  * @property {'ShipSelection'|'Playing'|'GameOver'} phase
+ * @property {number} wave - 1 at the start of every game session
  * @property {object} ship - {x, y, width, height, shipType, movementSpeed}
  * @property {Array<{x:number,y:number,width:number,height:number}>} aliens
- * @property {Array<{x:number,y:number,width:number,height:number,type:string,aliensDestroyed:number}>} projectiles
+ * @property {Array<{x:number,y:number,width:number,height:number,type:string,aliensHit:number}>} projectiles
  * @property {number} score
  * @property {Array<{score:number,initials:string,timestamp:number}>} highscores
  * @property {boolean} showHighscoreOverlay
@@ -22,6 +23,7 @@
  */
 export function createGameState({
   phase,
+  wave,
   ship,
   aliens,
   projectiles,
@@ -34,6 +36,7 @@ export function createGameState({
 }) {
   return Object.freeze({
     phase,
+    wave: Number(wave),
     ship: Object.freeze({ ...ship }),
     aliens: aliens.map((a) => Object.freeze({ ...a })),
     projectiles: projectiles.map((p) => Object.freeze({ ...p })),
