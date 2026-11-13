@@ -8,3 +8,4 @@
 | 03 | `SPEC.md` | ## Requirements | — | — |
 | 04 | `SPEC.md` | ## Requirements | — | — |
 | 05 | `SPEC.md` | ## Requirements | — | — |
+| 06 | `SPEC.md` | ## Requirements | — | — |
