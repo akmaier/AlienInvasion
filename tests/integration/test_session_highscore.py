@@ -9,8 +9,8 @@
 # Drives the real game code through Node: GameSession owns a HighscoreStore
 # (one per page session), entries hold score/initials/timestamp, the list is
 # capped at ten sorted by score descending, the GameOver screen shows it, it is
-# reachable in-game via 'H', a restart keeps the list (the session is the
-# page's session), and only a fresh page session starts empty.
+# reachable in-game via 'H', and a new game session - a restart from the
+# game-over screen, as a fresh page does - starts with an empty list.
 import json
 import subprocess
 import unittest
@@ -142,7 +142,7 @@ session.formation.aliens[0].y = session.ship.y - session.formation.aliens[0].hei
 session.update({ ...NOOP, fire: false }); // GameOver, awaiting initials
 session.submitInitials('CLA', 1000); // keep one entry
 const keptBeforeRestart = session.highscores.getEntries().length;
-// Restart: a new game in the same session keeps the list.
+// Restart: a new game session (GAME OVER RESTART NEW SESSION) empties the list.
 session.update({ ...NOOP, confirm: true });
 const afterRestart = session.highscores.getEntries().length;
 // A new page session starts with a fresh, empty store.
@@ -196,8 +196,8 @@ class TestSessionHighscore(unittest.TestCase):
                          "the entry must exist before the restart")
         self.assertEqual(result["phaseAfterRestart"], "ShipSelection",
                          "a restart returns to ship selection")
-        self.assertEqual(result["afterRestart"], 1,
-                         "a restart keeps the session highscore list (same page session)")
+        self.assertEqual(result["afterRestart"], 0,
+                         "a restart starts a new game session with an empty highscore list")
         self.assertEqual(result["freshStart"], 0,
                          "a new page session starts with an empty highscore list")
 

@@ -7,7 +7,8 @@
 //   GAME OVER CONDITION,
 //   PLAYER SHIP TYPE REGULAR, PLAYER SHIP TYPE SLOW,
 //   PLAYER SHIP SLOW MOVEMENT, PLAYER SHIP SLOW SPECIAL SHOT,
-//   SESSION HIGHSCORE DATA, SESSION HIGHSCORE LIMIT, SESSION HIGHSCORE RESET.
+//   SESSION HIGHSCORE DATA, SESSION HIGHSCORE LIMIT, SESSION HIGHSCORE RESET,
+//   SESSION START STATE.
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -455,7 +456,7 @@ describe('GameSession (MOD-game-logic; end-to-end simulation per frame)', () => 
     assert.strictEqual(session.phase, 'GameOver');
   });
 
-  it('restarts from GameOver into ShipSelection, clearing the score but keeping the highscores (SESSION HIGHSCORE RESET: the session is the page session)', () => {
+  it('restarts from GameOver into a new session at ShipSelection, clearing the score and the highscores (SESSION HIGHSCORE RESET, SESSION START STATE)', () => {
     const session = newSession();
     session.confirmShipSelection();
     session.formation.speed = 0;
@@ -467,8 +468,8 @@ describe('GameSession (MOD-game-logic; end-to-end simulation per frame)', () => 
     session.confirmShipSelection(); // restart
     assert.strictEqual(session.phase, 'ShipSelection');
     assert.strictEqual(session.score.get(), 0);
-    assert.strictEqual(session.highscores.getEntries().length, 1, 'restart keeps the highscore entry');
-    // a fresh session (page reload = new GameSession) starts empty
+    assert.strictEqual(session.highscores.getEntries().length, 0, 'a new session starts with an empty highscore list');
+    // a fresh session (page reload = new GameSession) starts empty as well
     assert.strictEqual(newSession().highscores.getEntries().length, 0);
   });
 
