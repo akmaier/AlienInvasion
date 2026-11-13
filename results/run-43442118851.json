@@ -1,0 +1,592 @@
+{
+  "workflow": "Agent M tests",
+  "product": "akmaier/AlienInvasion",
+  "run_id": "43442118851",
+  "run_attempt": "1",
+  "commit": "96911380bee4c586fddcbd5d2d1f17d89b2ce844",
+  "ref": "refs/heads/main",
+  "ran_at": "2026-11-13T14:22:44.525Z",
+  "exit_code": 0,
+  "summary": {
+    "suites": 19,
+    "tests": 130,
+    "passed": 130,
+    "failed": 0
+  },
+  "runner": {
+    "npm": {
+      "tests": "104",
+      "passed": "104",
+      "failed": "0",
+      "exit": 0
+    },
+    "python": {
+      "ran": "26",
+      "ok": true,
+      "exit": 0
+    }
+  },
+  "levels": {
+    "subsystem": {
+      "files": 1,
+      "tests": 13,
+      "passed": 13,
+      "failed": 0
+    },
+    "system": {
+      "files": 8,
+      "tests": 38,
+      "passed": 38,
+      "failed": 0
+    },
+    "release": {
+      "files": 2,
+      "tests": 0,
+      "passed": 0,
+      "failed": 0
+    },
+    "module": {
+      "files": 8,
+      "tests": 79,
+      "passed": 79,
+      "failed": 0
+    }
+  },
+  "requirements": [
+    {
+      "name": "IMPLEMENTATION JAVASCRIPT WEB",
+      "guarded_by": [
+        "tests/component/test_game_loop.js",
+        "tests/integration/test_web_implementation.py",
+        "tests/system/test_overlay_visibility.js",
+        "tests/system/test_playthrough.js",
+        "tests/unit/test_rendering.js"
+      ],
+      "guarded_by_review": [
+        "tests/review/architecture_review.md"
+      ],
+      "passing": true
+    },
+    {
+      "name": "GAMEPLAY HORIZONTAL MOVEMENT",
+      "guarded_by": [
+        "tests/integration/test_alien_movement.py",
+        "tests/system/test_playthrough.js",
+        "tests/unit/test_game_logic.js"
+      ],
+      "guarded_by_review": [],
+      "passing": true
+    },
+    {
+      "name": "GAMEPLAY DESCENDING MOVEMENT",
+      "guarded_by": [
+        "tests/integration/test_alien_movement.py",
+        "tests/system/test_playthrough.js",
+        "tests/unit/test_game_logic.js"
+      ],
+      "guarded_by_review": [],
+      "passing": true
+    },
+    {
+      "name": "PLAYER SHIP SELECTION",
+      "guarded_by": [
+        "tests/integration/test_ship_selection.py",
+        "tests/system/test_overlay_visibility.js",
+        "tests/system/test_playthrough.js",
+        "tests/unit/test_input.js",
+        "tests/unit/test_rendering.js"
+      ],
+      "guarded_by_review": [
+        "tests/review/architecture_review.md"
+      ],
+      "passing": true
+    },
+    {
+      "name": "PLAYER SHIP TYPE REGULAR",
+      "guarded_by": [
+        "tests/integration/test_ship_types.py",
+        "tests/unit/test_game_logic.js",
+        "tests/unit/test_rendering.js"
+      ],
+      "guarded_by_review": [],
+      "passing": true
+    },
+    {
+      "name": "PLAYER SHIP TYPE SLOW",
+      "guarded_by": [
+        "tests/integration/test_ship_types.py",
+        "tests/unit/test_game_logic.js"
+      ],
+      "guarded_by_review": [],
+      "passing": true
+    },
+    {
+      "name": "PLAYER SHIP SLOW MOVEMENT",
+      "guarded_by": [
+        "tests/system/test_playthrough.js",
+        "tests/unit/test_game_logic.js"
+      ],
+      "guarded_by_review": [],
+      "passing": true
+    },
+    {
+      "name": "PLAYER SHIP SLOW SPECIAL SHOT",
+      "guarded_by": [
+        "tests/system/test_playthrough.js",
+        "tests/unit/test_game_logic.js"
+      ],
+      "guarded_by_review": [],
+      "passing": true
+    },
+    {
+      "name": "PLAYER MOVEMENT KEYS",
+      "guarded_by": [
+        "tests/system/test_playthrough.js",
+        "tests/unit/test_input.js",
+        "tests/unit/test_player_movement.py"
+      ],
+      "guarded_by_review": [
+        "tests/review/architecture_review.md"
+      ],
+      "passing": true
+    },
+    {
+      "name": "PLAYER FIRE SPACEBAR",
+      "guarded_by": [
+        "tests/system/test_playthrough.js",
+        "tests/unit/test_input.js",
+        "tests/unit/test_player_fire.py"
+      ],
+      "guarded_by_review": [
+        "tests/review/architecture_review.md"
+      ],
+      "passing": true
+    },
+    {
+      "name": "PROJECTILE TRAVEL",
+      "guarded_by": [
+        "tests/system/test_playthrough.js",
+        "tests/unit/test_game_logic.js",
+        "tests/unit/test_projectile.py"
+      ],
+      "guarded_by_review": [],
+      "passing": true
+    },
+    {
+      "name": "PROJECTILE REMOVAL",
+      "guarded_by": [
+        "tests/unit/test_game_logic.js",
+        "tests/unit/test_projectile.py"
+      ],
+      "guarded_by_review": [],
+      "passing": true
+    },
+    {
+      "name": "ALIEN DESTRUCTION",
+      "guarded_by": [
+        "tests/system/test_playthrough.js",
+        "tests/unit/test_collision.py",
+        "tests/unit/test_game_logic.js"
+      ],
+      "guarded_by_review": [],
+      "passing": true
+    },
+    {
+      "name": "SCORE INCREMENT",
+      "guarded_by": [
+        "tests/system/test_playthrough.js",
+        "tests/unit/test_collision.py",
+        "tests/unit/test_game_logic.js"
+      ],
+      "guarded_by_review": [],
+      "passing": true
+    },
+    {
+      "name": "GAME OVER CONDITION",
+      "guarded_by": [
+        "tests/integration/test_game_over.py",
+        "tests/system/test_playthrough.js",
+        "tests/unit/test_game_logic.js"
+      ],
+      "guarded_by_review": [],
+      "passing": true
+    },
+    {
+      "name": "GAME END ALL ALIENS DESTROYED",
+      "guarded_by": [
+        "tests/integration/test_game_over.py"
+      ],
+      "guarded_by_review": [],
+      "passing": true
+    },
+    {
+      "name": "GAME OVER RESTART BUTTON",
+      "guarded_by": [
+        "tests/integration/test_game_over.py"
+      ],
+      "guarded_by_review": [],
+      "passing": true
+    },
+    {
+      "name": "GAME OVER RESTART BUTTON HIDDEN",
+      "guarded_by": [],
+      "guarded_by_review": [],
+      "passing": false
+    },
+    {
+      "name": "GAME OVER RESTART NEW SESSION",
+      "guarded_by": [],
+      "guarded_by_review": [],
+      "passing": false
+    },
+    {
+      "name": "SESSION START STATE",
+      "guarded_by": [
+        "tests/system/test_playthrough.js",
+        "tests/unit/test_game_logic.js"
+      ],
+      "guarded_by_review": [],
+      "passing": true
+    },
+    {
+      "name": "SCORE DISPLAY",
+      "guarded_by": [
+        "tests/system/test_overlay_visibility.js",
+        "tests/system/test_playthrough.js",
+        "tests/unit/test_rendering.js",
+        "tests/unit/test_ui.py"
+      ],
+      "guarded_by_review": [
+        "tests/review/architecture_review.md"
+      ],
+      "passing": true
+    },
+    {
+      "name": "KISS NO EXTRA FEATURES",
+      "guarded_by": [],
+      "guarded_by_review": [
+        "tests/review/code_review.md"
+      ],
+      "passing": true
+    },
+    {
+      "name": "YAGNI NO UNNECESSARY ABSTRACTION",
+      "guarded_by": [],
+      "guarded_by_review": [
+        "tests/review/architecture_review.md"
+      ],
+      "passing": true
+    },
+    {
+      "name": "SESSION HIGHSCORE DATA",
+      "guarded_by": [
+        "tests/integration/test_session_highscore.py",
+        "tests/system/test_playthrough.js",
+        "tests/unit/test_game_logic.js"
+      ],
+      "guarded_by_review": [],
+      "passing": true
+    },
+    {
+      "name": "SESSION HIGHSCORE LIMIT",
+      "guarded_by": [
+        "tests/integration/test_session_highscore.py",
+        "tests/unit/test_game_logic.js"
+      ],
+      "guarded_by_review": [],
+      "passing": true
+    },
+    {
+      "name": "SESSION HIGHSCORE DISPLAY GAMEOVER",
+      "guarded_by": [
+        "tests/integration/test_session_highscore.py",
+        "tests/system/test_overlay_visibility.js",
+        "tests/unit/test_rendering.js"
+      ],
+      "guarded_by_review": [],
+      "passing": true
+    },
+    {
+      "name": "SESSION HIGHSCORE DISPLAY INGAME",
+      "guarded_by": [
+        "tests/integration/test_session_highscore.py",
+        "tests/system/test_overlay_visibility.js"
+      ],
+      "guarded_by_review": [],
+      "passing": true
+    },
+    {
+      "name": "SESSION HIGHSCORE RESET",
+      "guarded_by": [
+        "tests/integration/test_session_highscore.py",
+        "tests/unit/test_game_logic.js"
+      ],
+      "guarded_by_review": [],
+      "passing": true
+    }
+  ],
+  "files": [
+    {
+      "file": "tests/component/test_game_loop.js",
+      "language": "javascript",
+      "level": "subsystem",
+      "tests": 13,
+      "passed": true,
+      "executable": true,
+      "guards": [
+        "IMPLEMENTATION JAVASCRIPT WEB"
+      ]
+    },
+    {
+      "file": "tests/integration/test_alien_movement.py",
+      "language": "python",
+      "level": "system",
+      "tests": 2,
+      "passed": true,
+      "executable": true,
+      "guards": [
+        "GAMEPLAY HORIZONTAL MOVEMENT",
+        "GAMEPLAY DESCENDING MOVEMENT"
+      ]
+    },
+    {
+      "file": "tests/integration/test_game_over.py",
+      "language": "python",
+      "level": "system",
+      "tests": 6,
+      "passed": true,
+      "executable": true,
+      "guards": [
+        "GAME OVER CONDITION",
+        "GAME END ALL ALIENS DESTROYED",
+        "GAME OVER RESTART BUTTON"
+      ]
+    },
+    {
+      "file": "tests/integration/test_session_highscore.py",
+      "language": "python",
+      "level": "system",
+      "tests": 5,
+      "passed": true,
+      "executable": true,
+      "guards": [
+        "SESSION HIGHSCORE DATA",
+        "SESSION HIGHSCORE LIMIT",
+        "SESSION HIGHSCORE DISPLAY GAMEOVER",
+        "SESSION HIGHSCORE DISPLAY INGAME",
+        "SESSION HIGHSCORE RESET"
+      ]
+    },
+    {
+      "file": "tests/integration/test_ship_selection.py",
+      "language": "python",
+      "level": "system",
+      "tests": 1,
+      "passed": true,
+      "executable": true,
+      "guards": [
+        "PLAYER SHIP SELECTION"
+      ]
+    },
+    {
+      "file": "tests/integration/test_ship_types.py",
+      "language": "python",
+      "level": "system",
+      "tests": 4,
+      "passed": true,
+      "executable": true,
+      "guards": [
+        "PLAYER SHIP TYPE REGULAR",
+        "PLAYER SHIP TYPE SLOW"
+      ]
+    },
+    {
+      "file": "tests/integration/test_web_implementation.py",
+      "language": "python",
+      "level": "system",
+      "tests": 1,
+      "passed": true,
+      "executable": true,
+      "guards": [
+        "IMPLEMENTATION JAVASCRIPT WEB"
+      ]
+    },
+    {
+      "file": "tests/review/architecture_review.md",
+      "language": "markdown",
+      "level": "release",
+      "tests": 0,
+      "passed": true,
+      "executable": false,
+      "guards": [
+        "IMPLEMENTATION JAVASCRIPT WEB",
+        "PLAYER SHIP SELECTION",
+        "PLAYER MOVEMENT KEYS",
+        "PLAYER FIRE SPACEBAR",
+        "SCORE DISPLAY",
+        "YAGNI NO UNNECESSARY ABSTRACTION"
+      ]
+    },
+    {
+      "file": "tests/review/code_review.md",
+      "language": "markdown",
+      "level": "release",
+      "tests": 0,
+      "passed": true,
+      "executable": false,
+      "guards": [
+        "KISS NO EXTRA FEATURES"
+      ]
+    },
+    {
+      "file": "tests/system/test_overlay_visibility.js",
+      "language": "javascript",
+      "level": "system",
+      "tests": 13,
+      "passed": true,
+      "executable": true,
+      "guards": [
+        "IMPLEMENTATION JAVASCRIPT WEB",
+        "PLAYER SHIP SELECTION",
+        "SCORE DISPLAY",
+        "SESSION HIGHSCORE DISPLAY GAMEOVER",
+        "SESSION HIGHSCORE DISPLAY INGAME"
+      ]
+    },
+    {
+      "file": "tests/system/test_playthrough.js",
+      "language": "javascript",
+      "level": "system",
+      "tests": 6,
+      "passed": true,
+      "executable": true,
+      "guards": [
+        "IMPLEMENTATION JAVASCRIPT WEB",
+        "GAMEPLAY HORIZONTAL MOVEMENT",
+        "GAMEPLAY DESCENDING MOVEMENT",
+        "PLAYER SHIP SELECTION",
+        "PLAYER SHIP SLOW MOVEMENT",
+        "PLAYER SHIP SLOW SPECIAL SHOT",
+        "PLAYER MOVEMENT KEYS",
+        "PLAYER FIRE SPACEBAR",
+        "PROJECTILE TRAVEL",
+        "ALIEN DESTRUCTION",
+        "SCORE INCREMENT",
+        "GAME OVER CONDITION",
+        "SESSION START STATE",
+        "SCORE DISPLAY",
+        "SESSION HIGHSCORE DATA"
+      ]
+    },
+    {
+      "file": "tests/unit/test_collision.py",
+      "language": "python",
+      "level": "module",
+      "tests": 2,
+      "passed": true,
+      "executable": true,
+      "guards": [
+        "ALIEN DESTRUCTION",
+        "SCORE INCREMENT"
+      ]
+    },
+    {
+      "file": "tests/unit/test_game_logic.js",
+      "language": "javascript",
+      "level": "module",
+      "tests": 40,
+      "passed": true,
+      "executable": true,
+      "guards": [
+        "GAMEPLAY HORIZONTAL MOVEMENT",
+        "GAMEPLAY DESCENDING MOVEMENT",
+        "PLAYER SHIP TYPE REGULAR",
+        "PLAYER SHIP TYPE SLOW",
+        "PLAYER SHIP SLOW MOVEMENT",
+        "PLAYER SHIP SLOW SPECIAL SHOT",
+        "PROJECTILE TRAVEL",
+        "PROJECTILE REMOVAL",
+        "ALIEN DESTRUCTION",
+        "SCORE INCREMENT",
+        "GAME OVER CONDITION",
+        "SESSION START STATE",
+        "SESSION HIGHSCORE DATA",
+        "SESSION HIGHSCORE LIMIT",
+        "SESSION HIGHSCORE RESET"
+      ]
+    },
+    {
+      "file": "tests/unit/test_input.js",
+      "language": "javascript",
+      "level": "module",
+      "tests": 14,
+      "passed": true,
+      "executable": true,
+      "guards": [
+        "PLAYER SHIP SELECTION",
+        "PLAYER MOVEMENT KEYS",
+        "PLAYER FIRE SPACEBAR"
+      ]
+    },
+    {
+      "file": "tests/unit/test_player_fire.py",
+      "language": "python",
+      "level": "module",
+      "tests": 1,
+      "passed": true,
+      "executable": true,
+      "guards": [
+        "PLAYER FIRE SPACEBAR"
+      ]
+    },
+    {
+      "file": "tests/unit/test_player_movement.py",
+      "language": "python",
+      "level": "module",
+      "tests": 1,
+      "passed": true,
+      "executable": true,
+      "guards": [
+        "PLAYER MOVEMENT KEYS"
+      ]
+    },
+    {
+      "file": "tests/unit/test_projectile.py",
+      "language": "python",
+      "level": "module",
+      "tests": 2,
+      "passed": true,
+      "executable": true,
+      "guards": [
+        "PROJECTILE TRAVEL",
+        "PROJECTILE REMOVAL"
+      ]
+    },
+    {
+      "file": "tests/unit/test_rendering.js",
+      "language": "javascript",
+      "level": "module",
+      "tests": 18,
+      "passed": true,
+      "executable": true,
+      "guards": [
+        "IMPLEMENTATION JAVASCRIPT WEB",
+        "PLAYER SHIP SELECTION",
+        "PLAYER SHIP TYPE REGULAR",
+        "SCORE DISPLAY",
+        "SESSION HIGHSCORE DISPLAY GAMEOVER"
+      ]
+    },
+    {
+      "file": "tests/unit/test_ui.py",
+      "language": "python",
+      "level": "module",
+      "tests": 1,
+      "passed": true,
+      "executable": true,
+      "guards": [
+        "SCORE DISPLAY"
+      ]
+    }
+  ]
+}
