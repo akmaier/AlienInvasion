@@ -28,6 +28,12 @@ export function createRenderer(ctx, dom) {
   return new Renderer(ctx, dom);
 }
 
+/** Wires the game-over screen's restart button to a new game session
+ *  (GAME OVER RESTART NEW SESSION). */
+export function connectRestart(session, renderer) {
+  renderer.onRestart(() => session.startNewGame());
+}
+
 function start() {
   if (typeof window === 'undefined' || typeof document === 'undefined') return;
   const canvas = document.querySelector('canvas');
@@ -44,6 +50,7 @@ function start() {
   input.connect();
   const session = createSession({ screenWidth: SCREEN_WIDTH, screenHeight: SCREEN_HEIGHT });
   const renderer = createRenderer(ctx, dom);
+  connectRestart(session, renderer);
   let wasAwaitingInitials = false;
   let submittedInitials = false;
 

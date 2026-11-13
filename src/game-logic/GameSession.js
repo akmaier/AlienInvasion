@@ -50,29 +50,11 @@ export class GameSession {
   constructor({ screenWidth = SCREEN_WIDTH, screenHeight = SCREEN_HEIGHT } = {}) {
     this.screenWidth = screenWidth;
     this.screenHeight = screenHeight;
-    this.ship = new Ship({
-      x: screenWidth / 2 - SHIP_WIDTH / 2,
-      y: screenHeight - SHIP_HEIGHT - 10,
-      width: SHIP_WIDTH,
-      height: SHIP_HEIGHT,
-      shipType: 'regular',
-    });
-    this.formation = this.createFormation();
-    this.projectiles = new ProjectileManager({
-      speed: 7,
-      width: PROJECTILE_WIDTH,
-      height: PROJECTILE_HEIGHT,
-    });
     this.score = new ScoreCounter();
     this.highscores = new HighscoreStore();
-    this.phase = 'ShipSelection';
-    this.selectedShipType = 'regular';
-    this.selectedShipOption = 0;
     this.shipSelectionOptions = SHIP_SELECTION_OPTIONS;
-    this.showHighscoreOverlay = false;
-    this.awaitingInitials = false;
-    this.finalScore = 0;
     this.#prevCommands = createGameCommands();
+    this.startNewGame();
   }
 
   #prevCommands;
@@ -105,13 +87,10 @@ export class GameSession {
     } else if (this.phase === 'Playing') {
       this.updatePlaying(commands);
     } else if (this.phase === 'GameOver') {
-      // GameOver -> ShipSelection on restart (ARC-004): clears entities and
-      // score but keeps the session highscore list - the session is the page's
-      // session (it starts when the page loads), so a restart starts a new
-      // game in the same session and keeps the list (SESSION HIGHSCORE RESET
-      // resets only on a new page session). While initials are awaited, the
-      // confirm key submits them instead (handled by the entry point), so it
-      // must not restart the session here.
+      // GameOver -> ShipSelection on restart (ARC-004): the confirm key, like
+      // the restart button, starts a new game session (startNewGame). While
+      // initials are awaited, the confirm key submits them instead (handled
+      // by the entry point), so it must not restart the session here.
       if (commands.confirm && !this.#prevCommands.confirm && !this.awaitingInitials) {
         this.startNewGame();
       }
@@ -226,12 +205,13 @@ export class GameSession {
     this.finalScore = this.score.get();
   }
 
-  /** Starts a new game in the current session: back to ShipSelection, score
-   *  cleared. The session highscore list is kept: the session is the page's
-   *  session (it starts when the page is loaded), so a restart keeps the
-   *  list and only a new page session starts empty (SESSION HIGHSCORE
-   *  RESET). */
+  /** Starts a new game session in the state the page loads with: ship
+   *  selection, regular ship at its start position, full formation, no
+   *  projectiles, score zero (SESSION START STATE) and an empty session
+   *  highscore list (SESSION HIGHSCORE RESET). Called on page load and by
+   *  the restart (GAME OVER RESTART NEW SESSION). */
   startNewGame() {
+    this.selectedShipType = 'regular';
     this.ship = new Ship({
       x: this.screenWidth / 2 - SHIP_WIDTH / 2,
       y: this.screenHeight - SHIP_HEIGHT - 10,
@@ -246,6 +226,7 @@ export class GameSession {
       height: PROJECTILE_HEIGHT,
     });
     this.score.reset();
+    this.highscores.clear();
     this.phase = 'ShipSelection';
     this.selectedShipOption = 0;
     this.showHighscoreOverlay = false;
