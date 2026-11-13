@@ -4,6 +4,10 @@ Alien Invasion is a small arcade game built with JavaScript and HTML Canvas. Pil
 
 **Alien Invasion is the first software created with agent-m.**
 
+## Play online
+
+Play Alien Invasion in your browser at <https://akmaier.github.io/AlienInvasion/>.
+
 ## Play locally
 
 Clone the repository and serve its files with a static web server. For example, with Python 3 installed:
