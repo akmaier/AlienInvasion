@@ -65,20 +65,24 @@ Projectiles shall be removed when they exit the top of the viewport or collide w
 *Check:* `tests/unit/test_projectile.py::test_removal_conditions` ensures that a projectile entity is deleted on exiting the canvas or on collision with an alien.
 
 **ALIEN DESTRUCTION** *(github.com/akmaier)*
-When a projectile collides with an alien, the alien shall be removed from the game area.
-*Check:* `tests/unit/test_collision.py::test_alien_removal` unit‑tests the collision handler to ensure the alien entity is deleted.
+An alien of the n‑th wave shall be removed from the game area by exactly the n‑th projectile hit it receives.
+*Check:* `tests/unit/test_collision.py::test_alien_removal` unit‑tests the collision handler to ensure that an alien of wave n stays in the game area after n − 1 hits and is deleted on the n‑th hit.
 
 **SCORE INCREMENT** *(github.com/akmaier)*
-When a projectile collides with an alien, the player's score shall increase by one point.
-*Check:* `tests/unit/test_collision.py::test_score_increment` unit‑tests that the score counter increments by exactly one on alien destruction.
+When a projectile hit removes an alien, the player's score shall increase by one point.
+*Check:* `tests/unit/test_collision.py::test_score_increment` unit‑tests that the score counter increments by exactly one on alien destruction and stays unchanged on a hit that leaves the alien in the game area.
 
 **GAME OVER CONDITION** *(github.com/akmaier)*
 The game shall end when any alien reaches the bottom of the screen or collides with the player's ship.
 *Check:* `tests/integration/test_game_over.py::test_game_over_conditions` simulates an alien reaching the lower boundary or colliding with the ship and verifies that the game switches to a Game‑Over state and stops spawning new entities.
 
-**GAME END ALL ALIENS DESTROYED** *(github.com/akmaier)*
-The game shall end when every alien has been destroyed.
-*Check:* `tests/integration/test_game_over.py::test_game_ends_when_all_aliens_destroyed` destroys every alien of the formation and verifies that the game switches to the Game‑Over state.
+**WAVE FIRST** *(github.com/akmaier)*
+A game session shall begin with wave 1.
+*Check:* `tests/integration/test_waves.py::test_session_begins_with_wave_one` starts a game session on a freshly loaded page and again by the restart button after reaching wave 2, and verifies both times that the wave is 1 and that an alien is removed by a single hit.
+
+**WAVE NEXT** *(github.com/akmaier)*
+When every alien of the current wave has been destroyed, the next wave shall start with a full alien formation in its start position.
+*Check:* `tests/integration/test_waves.py::test_next_wave_after_formation_destroyed` destroys all 24 aliens of wave 1 and verifies that the game is not in the Game‑Over state and that wave 2 starts with a full formation in the start position of wave 1.
 
 **GAME OVER RESTART BUTTON** *(github.com/akmaier)*
 While the game is in the Game‑Over state, the game‑over screen shall display a restart button.
@@ -124,6 +128,18 @@ The session highscore list shall be displayed on the game-over screen.
 The session highscore list shall be accessible on demand during gameplay.
 *Check:* `tests/integration/test_session_highscore.py::test_highscore_access_ingame` verifies that the list can be opened during play.
 
-**SESSION HIGHSCORE RESET** *(github.com/akmaier)*
-The session highscore list shall reset to empty when a new game session starts.
-*Check:* `tests/integration/test_session_highscore.py::test_highscore_reset_on_new_session` verifies that starting a new session clears all prior entries.
+**SESSION HIGHSCORE DISPLAY ENTRIES** *(github.com/akmaier)*
+Wherever the session highscore list is displayed, it shall show the initials and the score of each of its entries.
+*Check:* `tests/integration/test_session_highscore.py::test_highscore_display_entries` fills the list with several entries of different initials and verifies that the game-over screen and the list opened during play show the initials and score of every entry.
+
+**SESSION HIGHSCORE KEPT ON NEW SESSION** *(github.com/akmaier)*
+The session highscore list shall keep its entries when a new game session starts.
+*Check:* `tests/integration/test_session_highscore.py::test_highscore_kept_on_new_session` ends a game with an entry, starts a new session by the restart button, and verifies that the list still holds the entry.
+
+**SESSION HIGHSCORE KEPT ON RELOAD** *(github.com/akmaier)*
+The session highscore list shall keep its entries when the page is reloaded in the same browser.
+*Check:* `tests/integration/test_session_highscore.py::test_highscore_kept_on_reload` ends a game with an entry, reloads the page, and verifies that the list still holds the entry.
+
+**SESSION HIGHSCORE COOKIE STORAGE** *(github.com/akmaier)*
+The session highscore list shall be stored in the browser's cookies.
+*Check:* `tests/integration/test_session_highscore.py::test_highscore_stored_in_cookie` ends a game with an entry and verifies that a cookie of the page holds the entry's score, initials and timestamp.
