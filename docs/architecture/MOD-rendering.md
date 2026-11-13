@@ -6,6 +6,7 @@ realises:
   - SCORE DISPLAY
   - SESSION HIGHSCORE DISPLAY GAMEOVER
   - SESSION HIGHSCORE DISPLAY INGAME
+  - SESSION HIGHSCORE DISPLAY ENTRIES
   - GAME OVER RESTART BUTTON
   - GAME OVER RESTART BUTTON HIDDEN
   - IMPLEMENTATION JAVASCRIPT WEB
@@ -34,8 +35,8 @@ Draw the current `GameState` to an HTML `<canvas>` and manage DOM overlays for s
 
 - `CanvasRenderer` — Draws ship, aliens, projectiles to canvas each frame. **Renders ship with type-appropriate visuals (regular vs slow).**
 - `ScoreDisplay` — Updates a DOM element with the current score.
-- `GameOverScreen` — Shows/hides the game-over overlay with final score, highscore list and restart button; the button exists only while the overlay is shown.
-- `HighscoreOverlay` — Shows/hides the in-game highscore list overlay (triggered by 'H' key).
+- `GameOverScreen` — Shows/hides the game-over overlay with final score, highscore list (each entry's initials and score) and restart button; the button exists only while the overlay is shown.
+- `HighscoreOverlay` — Shows/hides the in-game highscore list overlay (triggered by 'H' key), each entry with its initials and score.
 - `InitialsPrompt` — Prompts for player initials when a new highscore qualifies.
 - `ShipSelectionScreen` — **Renders the ship selection UI showing available ship types with their characteristics, highlights the currently selected option.**
 - `Renderer` — Facade coordinating all drawing and overlay management.

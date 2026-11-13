@@ -13,6 +13,9 @@ forced_by:
   - SCORE INCREMENT
   - GAME OVER CONDITION
   - SCORE DISPLAY
+  - WAVE NEXT
+  - SESSION HIGHSCORE KEPT ON RELOAD
+  - SESSION HIGHSCORE COOKIE STORAGE
   - KISS NO EXTRA FEATURES
   - YAGNI NO UNNECESSARY ABSTRACTION
   - UC-001
@@ -21,6 +24,7 @@ forced_by:
   - UC-004
   - UC-005
   - UC-006
+  - UC-009
 designs: []
 ---
 
@@ -28,7 +32,7 @@ designs: []
 
 ## Context
 
-The Alien Invasion game is a client-side web application running entirely in the browser. All gameplay logic, rendering, input handling, and state management execute on the client. No server component exists. The system must support the core gameplay loop: alien formation movement, player ship control, projectile firing and collision, score tracking, game-over detection, and session highscore management — all within a single HTML page loading a JavaScript module.
+The Alien Invasion game is a client-side web application running entirely in the browser. All gameplay logic, rendering, input handling, and state management execute on the client. No server component exists. The system must support the core gameplay loop: alien formation movement, player ship control, projectile firing and collision, score tracking, waves of aliens, game-over detection, and session highscore management — all within a single HTML page loading a JavaScript module.
 
 ## Decision
 
@@ -37,12 +41,12 @@ The architecture follows a **simple module-based game loop** pattern with these 
 - **Single HTML entry point** (`index.html`) loads one JavaScript module (`game.js`).
 - **RequestAnimationFrame-driven loop** advances simulation and rendering each frame.
 - **Flat module structure**: one file per concern (input, rendering, game state, entities, highscore), no layering, no dependency injection, no framework.
-- **In-memory state only**: all game data lives in JavaScript objects; no persistence across page reloads.
+- **In-memory state, one cookie**: all game data lives in JavaScript objects; the only data kept across page reloads is the session highscore list, which is also written to one browser cookie (ARC-005). The cookie lives in the browser that runs the game; there is still no server.
 - **No build step**: plain ES modules run directly in the browser.
 
 The loop order each frame:
 1. Read input state
-2. Update game state (movement, collisions, spawn/despawn)
+2. Update game state (movement, collisions, spawn/despawn, start of the next wave)
 3. Check game-over conditions
 4. Render to canvas
 5. Update UI (score display)
@@ -71,4 +75,5 @@ flowchart LR
     Loop --> Render[Canvas Renderer]
     Loop --> UI[Score / Highscore UI]
     State --> Highscore[Session Highscore Store]
+    Highscore --> Cookie[(Browser Cookie)]
 ```

@@ -17,7 +17,9 @@ forced_by:
   - SESSION HIGHSCORE LIMIT
   - SESSION HIGHSCORE DISPLAY GAMEOVER
   - SESSION HIGHSCORE DISPLAY INGAME
-  - SESSION HIGHSCORE RESET
+  - SESSION HIGHSCORE KEPT ON NEW SESSION
+  - WAVE FIRST
+  - WAVE NEXT
   - GAME OVER RESTART NEW SESSION
   - SESSION START STATE
   - PLAYER SHIP SELECTION
@@ -33,6 +35,7 @@ forced_by:
   - UC-006
   - UC-007
   - UC-008
+  - UC-009
 designs:
   - MOD-game-logic
 ---
@@ -41,7 +44,7 @@ designs:
 
 ## Context
 
-The game has three primary states: **ShipSelection**, **Playing**, and **GameOver**. Transitions are triggered by ship selection, game-over conditions (alien reaches bottom, alien collides with ship), and by the player starting a new session. The state machine controls which systems run each frame and which UI is visible.
+The game has three primary states: **ShipSelection**, **Playing**, and **GameOver**. Transitions are triggered by ship selection, game-over conditions (alien reaches bottom, alien collides with ship), and by the player starting a new session. The state machine controls which systems run each frame and which UI is visible. Within Playing, the game advances through waves (UC-009): a cleared formation starts the next wave instead of ending the game.
 
 ## Decision
 
@@ -66,7 +69,8 @@ A **simple three-state machine** implemented as a string variable `gameState` wi
   - Player ship responds to input with type-specific movement speed
   - Projectiles fire and move with type-specific behavior (regular: single alien; slow: up to three aliens)
   - Collision detection active
-  - Score increments on alien destruction
+  - A hit removes an alien only on its n‑th hit in wave n; the score increments when an alien is removed
+  - When the last alien of the formation is removed, the next wave starts: `wave` increases by 1 and a new full formation is created in its start position, its aliens needing `wave` hits each (WAVE NEXT); score, ship and phase are unchanged
   - Highscore overlay accessible via 'H' key
 
 - **GameOver state**:
@@ -85,16 +89,17 @@ A **simple three-state machine** implemented as a string variable `gameState` wi
 - **Transition GameOver → ShipSelection**: player clicks the restart button (or presses the restart key); `startNewGame()` called, which starts a new game session in the state the page loads with — the constructor calls the same method (SESSION START STATE):
   - Regular ship at its start position, full alien formation, no projectiles
   - Resets score to 0
-  - Empties the session highscore list (SESSION HIGHSCORE RESET)
+  - Sets `wave` to 1 (WAVE FIRST)
+  - Keeps the session highscore list (SESSION HIGHSCORE KEPT ON NEW SESSION)
   - Sets phase to 'ShipSelection' (new game session)
 
-No pause state, no menu state, no level transition — YAGNI.
+The wave is a number held by `GameSession`, not a state of the machine: a new wave changes neither the allowed inputs nor the running systems, only the formation. No pause state, no menu state — YAGNI.
 
 ## Alternatives
 
 - **Explicit state class hierarchy** (`ShipSelectionState`, `PlayingState`, `GameOverState` with `enter()`, `update()`, `exit()`) — rejected: adds files and boilerplate for three states; violates YAGNI.
 - **State machine library (e.g., `xstate`)** — rejected: external dependency for a 3-state machine; violates YAGNI.
-- **Enum-like object with sub-states** (e.g., `playing: { wave: 1 }`) — rejected: no wave/level concept in SPEC.
+- **Enum-like object with sub-states** (e.g., `playing: { wave: 1 }`) or a separate `WaveTransition` state — rejected: a wave changes no input handling and no running system, so a state of its own adds transitions without behaviour; a counter is the simplest design (KISS).
 
 ## Consequences
 
@@ -120,6 +125,7 @@ stateDiagram-v2
     state Playing {
         [*] --> Running
         Running --> Running: each frame
+        Running --> Running: last alien removed (wave += 1, new full formation)
         Running --> HighscoreOverlay: H key pressed
         HighscoreOverlay --> Running: H key / ESC pressed
     }
