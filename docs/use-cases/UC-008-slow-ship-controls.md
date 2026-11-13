@@ -41,7 +41,7 @@ realises:
 - **A1: Simultaneous key presses** — If both left and right keys are held, the slow ship does not move (inputs cancel).
 - **A2: Fire while moving** — Firing does not interrupt horizontal movement; the special projectile spawns at the slow ship's current position.
 - **A3: Key release at edge** — If the player releases the movement key exactly at the screen edge, the slow ship remains at the edge.
-- **A4: Special projectile hits multiple aliens** — The special projectile intersects up to three aliens sequentially; each intersected alien is destroyed and the projectile continues until the third alien is destroyed or the projectile exits the viewport.
+- **A4: Special projectile hits multiple aliens** — The special projectile intersects up to three aliens sequentially; each intersected alien receives one hit and is destroyed when that hit is its n‑th in wave n (UC-003); the projectile continues until it has hit the third alien or exits the viewport.
 - **A5: Special projectile misses all aliens** — Special projectile continues upward until it exits the viewport and is removed.
 
 ## Postcondition
@@ -49,7 +49,7 @@ realises:
 - Slow ship horizontal position reflects the net left/right input and stays within screen bounds.
 - Slow ship moves at a slower horizontal speed than the regular ship.
 - A special projectile exists and moves upward from the slow ship's position at the moment of firing.
-- Special projectile destroys up to three aliens before being removed.
+- Special projectile hits up to three aliens, and so destroys up to three, before being removed.
 
 ```mermaid
 flowchart TD
@@ -65,8 +65,8 @@ flowchart TD
     H -->|No| D
     E --> J[Special Projectile Moves Upward]
     J --> K{Collision with Alien?}
-    K -->|Yes| L[Destroy Alien]
-    L --> M{Aliens Destroyed < 3?}
+    K -->|Yes| L[Alien Receives One Hit, Destroyed on n-th Hit of Wave n]
+    L --> M{Aliens Hit < 3?}
     M -->|Yes| J
     M -->|No| N[Remove Special Projectile]
     K -->|No| O{Exited Viewport Top?}

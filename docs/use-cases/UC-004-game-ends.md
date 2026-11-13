@@ -34,7 +34,7 @@ realises:
 5. Session highscore list is shown (see UC-006).
 6. Game‑Over screen shows a restart button; no restart button is shown in any other state.
 7. Player clicks the restart button.
-8. System starts a new game session: the ship selection screen is shown (UC-007), with score, alien formation and player's ship as on page load and an empty session highscore list.
+8. System starts a new game session: the ship selection screen is shown (UC-007), with score, alien formation and player's ship as on page load, the game at wave 1 (UC-009) and the session highscore list keeping its entries (UC-006).
 
 ## Alternative flows
 
