@@ -1,27 +1,27 @@
 {
   "workflow": "Agent M tests",
   "product": "akmaier/AlienInvasion",
-  "run_id": "43451702053",
+  "run_id": "43453063665",
   "run_attempt": "1",
-  "commit": "49cf871c8514266dfea6cbd7c40df9d82e6299e0",
+  "commit": "0a392ca62e683d7e5bca16680482ce4ea60ff706",
   "ref": "refs/heads/main",
-  "ran_at": "2026-11-13T15:21:12.642Z",
+  "ran_at": "2026-11-13T15:29:20.827Z",
   "exit_code": 0,
   "summary": {
-    "suites": 19,
-    "tests": 130,
-    "passed": 130,
+    "suites": 20,
+    "tests": 141,
+    "passed": 141,
     "failed": 0
   },
   "runner": {
     "npm": {
-      "tests": "104",
-      "passed": "104",
+      "tests": "111",
+      "passed": "111",
       "failed": "0",
       "exit": 0
     },
     "python": {
-      "ran": "26",
+      "ran": "30",
       "ok": true,
       "exit": 0
     }
@@ -34,9 +34,9 @@
       "failed": 0
     },
     "system": {
-      "files": 8,
-      "tests": 38,
-      "passed": 38,
+      "files": 9,
+      "tests": 42,
+      "passed": 42,
       "failed": 0
     },
     "release": {
@@ -47,8 +47,8 @@
     },
     "module": {
       "files": 8,
-      "tests": 79,
-      "passed": 79,
+      "tests": 86,
+      "passed": 86,
       "failed": 0
     }
   },
@@ -213,15 +213,27 @@
     },
     {
       "name": "WAVE FIRST",
-      "guarded_by": [],
-      "guarded_by_review": [],
-      "passing": false
+      "guarded_by": [
+        "tests/integration/test_waves.py",
+        "tests/system/test_playthrough.js",
+        "tests/unit/test_game_logic.js"
+      ],
+      "guarded_by_review": [
+        "tests/review/code_review.md"
+      ],
+      "passing": true
     },
     {
       "name": "WAVE NEXT",
-      "guarded_by": [],
-      "guarded_by_review": [],
-      "passing": false
+      "guarded_by": [
+        "tests/integration/test_waves.py",
+        "tests/system/test_playthrough.js",
+        "tests/unit/test_game_logic.js"
+      ],
+      "guarded_by_review": [
+        "tests/review/code_review.md"
+      ],
+      "passing": true
     },
     {
       "name": "GAME OVER RESTART BUTTON",
@@ -327,21 +339,29 @@
     },
     {
       "name": "SESSION HIGHSCORE KEPT ON NEW SESSION",
-      "guarded_by": [],
+      "guarded_by": [
+        "tests/unit/test_game_logic.js"
+      ],
       "guarded_by_review": [],
-      "passing": false
+      "passing": true
     },
     {
       "name": "SESSION HIGHSCORE KEPT ON RELOAD",
-      "guarded_by": [],
+      "guarded_by": [
+        "tests/unit/test_game_logic.js"
+      ],
       "guarded_by_review": [],
-      "passing": false
+      "passing": true
     },
     {
       "name": "SESSION HIGHSCORE COOKIE STORAGE",
-      "guarded_by": [],
-      "guarded_by_review": [],
-      "passing": false
+      "guarded_by": [
+        "tests/unit/test_game_logic.js"
+      ],
+      "guarded_by_review": [
+        "tests/review/code_review.md"
+      ],
+      "passing": true
     }
   ],
   "files": [
@@ -372,7 +392,7 @@
       "file": "tests/integration/test_game_over.py",
       "language": "python",
       "level": "system",
-      "tests": 6,
+      "tests": 5,
       "passed": true,
       "executable": true,
       "guards": [
@@ -384,15 +404,14 @@
       "file": "tests/integration/test_session_highscore.py",
       "language": "python",
       "level": "system",
-      "tests": 5,
+      "tests": 8,
       "passed": true,
       "executable": true,
       "guards": [
         "SESSION HIGHSCORE DATA",
         "SESSION HIGHSCORE LIMIT",
         "SESSION HIGHSCORE DISPLAY GAMEOVER",
-        "SESSION HIGHSCORE DISPLAY INGAME",
-        "SESSION HIGHSCORE RESET"
+        "SESSION HIGHSCORE DISPLAY INGAME"
       ]
     },
     {
@@ -416,6 +435,18 @@
       "guards": [
         "PLAYER SHIP TYPE REGULAR",
         "PLAYER SHIP TYPE SLOW"
+      ]
+    },
+    {
+      "file": "tests/integration/test_waves.py",
+      "language": "python",
+      "level": "system",
+      "tests": 2,
+      "passed": true,
+      "executable": true,
+      "guards": [
+        "WAVE FIRST",
+        "WAVE NEXT"
       ]
     },
     {
@@ -453,7 +484,10 @@
       "passed": true,
       "executable": false,
       "guards": [
-        "KISS NO EXTRA FEATURES"
+        "WAVE FIRST",
+        "WAVE NEXT",
+        "KISS NO EXTRA FEATURES",
+        "SESSION HIGHSCORE COOKIE STORAGE"
       ]
     },
     {
@@ -491,6 +525,8 @@
         "ALIEN DESTRUCTION",
         "SCORE INCREMENT",
         "GAME OVER CONDITION",
+        "WAVE FIRST",
+        "WAVE NEXT",
         "SESSION START STATE",
         "SCORE DISPLAY",
         "SESSION HIGHSCORE DATA"
@@ -512,7 +548,7 @@
       "file": "tests/unit/test_game_logic.js",
       "language": "javascript",
       "level": "module",
-      "tests": 40,
+      "tests": 47,
       "passed": true,
       "executable": true,
       "guards": [
@@ -527,9 +563,14 @@
         "ALIEN DESTRUCTION",
         "SCORE INCREMENT",
         "GAME OVER CONDITION",
+        "WAVE FIRST",
+        "WAVE NEXT",
         "SESSION START STATE",
         "SESSION HIGHSCORE DATA",
-        "SESSION HIGHSCORE LIMIT"
+        "SESSION HIGHSCORE LIMIT",
+        "SESSION HIGHSCORE KEPT ON NEW SESSION",
+        "SESSION HIGHSCORE KEPT ON RELOAD",
+        "SESSION HIGHSCORE COOKIE STORAGE"
       ]
     },
     {
