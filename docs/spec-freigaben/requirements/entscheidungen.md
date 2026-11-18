@@ -8,3 +8,4 @@ Append-only.
 | 2026-11-13 12:18 UTC | 6 | uebernommen | approval:spec-requirements-06-6301c92a9a8f.md |
 | 2026-11-13 15:10 UTC | 7 | uebernommen | approval:spec-requirements-07-e43c7b463732.md |
 | 2026-11-18 12:38 UTC | 8 | uebernommen | approval:spec-requirements-08-a3837cb30bad.md |
+| 2026-11-18 13:26 UTC | 9 | uebernommen | approval:spec-requirements-09-4372e8c793cd.md |

@@ -18,6 +18,8 @@ The hierarchy of the requirements, each member by its name.
   - WAVE FIRST
   - WAVE NEXT
   - ALIEN PIXEL SHAPE
+  - PLAYER SHIP REGULAR PIXEL SHAPE
+  - PLAYER SHIP SLOW PIXEL SHAPE
 - Scoring & Game State
   - GAME OVER CONDITION
   - SCORE DISPLAY

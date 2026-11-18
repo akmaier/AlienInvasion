@@ -52,6 +52,14 @@ The slow ship shall move horizontally at a slower speed than the regular ship.
 The slow ship shall fire a special projectile that can destroy up to three aliens in a single shot.
 *Check:* `tests/integration/test_ship_types.py::test_slow_ship_special_shot` verifies the slow ship's projectile destroys up to three aliens per shot.
 
+**PLAYER SHIP REGULAR PIXEL SHAPE** *(github.com/akmaier)*
+The regular ship shall be drawn as a pixel‑art figure of the Claude pet, built from equal square pixels that leave part of its bounding box empty.
+*Check:* `tests/component/test_ship_pixel_shape.js::draws the regular ship as a pixel figure` records the canvas calls with which the regular ship is drawn and verifies that it is drawn from equal square pixels inside its bounding box, that at least one pixel cell of the box stays empty, and that no call fills the whole box; that the figure shows the Claude pet is checked at review.
+
+**PLAYER SHIP SLOW PIXEL SHAPE** *(github.com/akmaier)*
+The slow ship shall be drawn as a pixel‑art figure of the DeepSeek whale, built from equal square pixels that leave part of its bounding box empty.
+*Check:* `tests/component/test_ship_pixel_shape.js::draws the slow ship as a pixel figure` records the canvas calls with which the slow ship is drawn and verifies that it is drawn from equal square pixels inside its bounding box, that at least one pixel cell of the box stays empty, and that no call fills the whole box; that the figure shows the DeepSeek whale is checked at review.
+
 **PLAYER MOVEMENT KEYS** *(github.com/akmaier)*
 The player's ship shall be movable horizontally across the bottom of the screen using either the Arrow‑Left/Arrow‑Right keys or the WASD keys (A/D).
 *Check:* `tests/unit/test_player_movement.py::test_key_controls` injects Arrow‑Left, Arrow‑Right, A and D keydown events and verifies that the ship's x‑position changes accordingly and remains within screen bounds.
