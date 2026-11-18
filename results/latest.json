@@ -1,22 +1,22 @@
 {
   "workflow": "Agent M tests",
   "product": "akmaier/AlienInvasion",
-  "run_id": "44313825954",
+  "run_id": "44314533110",
   "run_attempt": "1",
-  "commit": "17d1256f770cf11f7c43073fc509918794760469",
+  "commit": "5a5fbc9b6a4110939dfc682f360aa35fab92c2c8",
   "ref": "refs/heads/main",
-  "ran_at": "2026-11-18T13:27:14.181Z",
+  "ran_at": "2026-11-18T13:31:50.298Z",
   "exit_code": 0,
   "summary": {
-    "suites": 21,
-    "tests": 142,
-    "passed": 142,
+    "suites": 22,
+    "tests": 144,
+    "passed": 144,
     "failed": 0
   },
   "runner": {
     "npm": {
-      "tests": "112",
-      "passed": "112",
+      "tests": "114",
+      "passed": "114",
       "failed": "0",
       "exit": 0
     },
@@ -28,9 +28,9 @@
   },
   "levels": {
     "subsystem": {
-      "files": 2,
-      "tests": 14,
-      "passed": 14,
+      "files": 3,
+      "tests": 16,
+      "passed": 16,
       "failed": 0
     },
     "system": {
@@ -149,15 +149,19 @@
     },
     {
       "name": "PLAYER SHIP REGULAR PIXEL SHAPE",
-      "guarded_by": [],
+      "guarded_by": [
+        "tests/component/test_ship_pixel_shape.js"
+      ],
       "guarded_by_review": [],
-      "passing": false
+      "passing": true
     },
     {
       "name": "PLAYER SHIP SLOW PIXEL SHAPE",
-      "guarded_by": [],
+      "guarded_by": [
+        "tests/component/test_ship_pixel_shape.js"
+      ],
       "guarded_by_review": [],
-      "passing": false
+      "passing": true
     },
     {
       "name": "PLAYER MOVEMENT KEYS",
@@ -406,6 +410,18 @@
       "executable": true,
       "guards": [
         "IMPLEMENTATION JAVASCRIPT WEB"
+      ]
+    },
+    {
+      "file": "tests/component/test_ship_pixel_shape.js",
+      "language": "javascript",
+      "level": "subsystem",
+      "tests": 2,
+      "passed": true,
+      "executable": true,
+      "guards": [
+        "PLAYER SHIP REGULAR PIXEL SHAPE",
+        "PLAYER SHIP SLOW PIXEL SHAPE"
       ]
     },
     {
