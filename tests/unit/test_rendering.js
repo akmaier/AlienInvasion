@@ -4,7 +4,7 @@
 // Requirements exercised:
 //   SCORE DISPLAY, SESSION HIGHSCORE DISPLAY GAMEOVER/INGAME,
 //   PLAYER SHIP SELECTION, PLAYER SHIP TYPE REGULAR/SLOW,
-//   IMPLEMENTATION JAVASCRIPT WEB.
+//   IMPLEMENTATION JAVASCRIPT WEB, ALIEN PIXEL SHAPE (aliens drawn inside their boxes).
 // The module is purely presentational: it reads GameState and mutates no
 // simulation state. Tests use a mock 2D canvas context and fake DOM elements.
 
@@ -100,6 +100,10 @@ function baseState({ phase = 'Playing', score = 0, showHighscoreOverlay = false,
   };
 }
 
+function insideBox([x, y, w, h], box) {
+  return x >= box.x && y >= box.y && x + w <= box.x + box.width && y + h <= box.y + box.height;
+}
+
 describe('CanvasRenderer (MOD-rendering; ARC-002 draw order)', () => {
   it('clears the whole canvas', () => {
     const ctx = mockContext();
@@ -116,17 +120,19 @@ describe('CanvasRenderer (MOD-rendering; ARC-002 draw order)', () => {
     assert.deepStrictEqual(ctx.calls, [{ method: 'fillRect', args: [0, 0, WIDTH, HEIGHT] }]);
   });
 
-  it('draws one rectangle per alien at its position', () => {
+  it('draws every alien inside its own box at its position', () => {
     const ctx = mockContext();
     const renderer = new CanvasRenderer(ctx);
-    renderer.drawAliens([
+    const boxes = [
       { x: 60, y: 50, width: 40, height: 30 },
       { x: 130, y: 50, width: 40, height: 30 },
-    ]);
-    assert.deepStrictEqual(ctx.calls, [
-      { method: 'fillRect', args: [60, 50, 40, 30] },
-      { method: 'fillRect', args: [130, 50, 40, 30] },
-    ]);
+    ];
+    renderer.drawAliens(boxes);
+    assert.ok(ctx.calls.every((c) => c.method === 'fillRect'));
+    for (const box of boxes) {
+      assert.ok(ctx.calls.some((c) => insideBox(c.args, box)), `alien at ${box.x} is drawn`);
+    }
+    assert.ok(ctx.calls.every((c) => boxes.some((box) => insideBox(c.args, box))));
   });
 
   it('draws the ship with type-appropriate visuals', () => {
@@ -164,14 +170,13 @@ describe('Renderer.draw order (MOD-rendering; ARC-002 back-to-front)', () => {
     const fillRects = ctx.calls.filter((c) => c.method === 'fillRect');
     const background = fillRects[0];
     assert.deepStrictEqual(background.args, [0, 0, WIDTH, HEIGHT]);
-    const alienRects = fillRects.slice(1, 3);
-    assert.deepStrictEqual(alienRects, [
-      { method: 'fillRect', args: [60, 50, 40, 30] },
-      { method: 'fillRect', args: [130, 50, 40, 30] },
-    ]);
-    const shipRect = fillRects[3];
+    const alienRects = fillRects.slice(1, -2);
+    const alienBoxes = state.aliens;
+    assert.ok(alienRects.length >= alienBoxes.length);
+    assert.ok(alienRects.every((c) => alienBoxes.some((box) => insideBox(c.args, box))));
+    const shipRect = fillRects[fillRects.length - 2];
     assert.deepStrictEqual(shipRect.args, [380, 560, 40, 30]);
-    const projectileRect = fillRects[4];
+    const projectileRect = fillRects[fillRects.length - 1];
     assert.deepStrictEqual(projectileRect.args, [398, 500, 4, 10]);
     assert.strictEqual(ctx.calls[0].method, 'clearRect');
   });
