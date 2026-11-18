@@ -4,7 +4,8 @@
 // Requirements exercised:
 //   SCORE DISPLAY, SESSION HIGHSCORE DISPLAY GAMEOVER/INGAME,
 //   PLAYER SHIP SELECTION, PLAYER SHIP TYPE REGULAR/SLOW,
-//   IMPLEMENTATION JAVASCRIPT WEB, ALIEN PIXEL SHAPE (aliens drawn inside their boxes).
+//   IMPLEMENTATION JAVASCRIPT WEB, ALIEN PIXEL SHAPE (aliens drawn inside their boxes),
+//   PLAYER SHIP REGULAR/SLOW PIXEL SHAPE (ships drawn inside their box).
 // The module is purely presentational: it reads GameState and mutates no
 // simulation state. Tests use a mock 2D canvas context and fake DOM elements.
 
@@ -135,15 +136,18 @@ describe('CanvasRenderer (MOD-rendering; ARC-002 draw order)', () => {
     assert.ok(ctx.calls.every((c) => boxes.some((box) => insideBox(c.args, box))));
   });
 
-  it('draws the ship with type-appropriate visuals', () => {
-    const ctx = mockContext();
-    const renderer = new CanvasRenderer(ctx);
-    renderer.drawShip(380, 40, 'regular');
-    assert.deepStrictEqual(ctx.calls, [{ method: 'fillRect', args: [380, 560, 40, 30] }]);
-    assert.strictEqual(ctx.fillStyle, '#1e88e5');
-    ctx.calls = [];
-    renderer.drawShip(380, 40, 'slow');
-    assert.notStrictEqual(ctx.fillStyle, '#1e88e5');
+  it('draws the ship with type-appropriate visuals inside its box', () => {
+    const shipBox = { x: 380, y: 560, width: 40, height: 30 };
+    const drawn = {};
+    for (const shipType of ['regular', 'slow']) {
+      const ctx = mockContext();
+      new CanvasRenderer(ctx).drawShip(380, 40, shipType);
+      assert.ok(ctx.calls.length > 0, `the ${shipType} ship is drawn`);
+      assert.ok(ctx.calls.every((c) => c.method === 'fillRect' && insideBox(c.args, shipBox)));
+      drawn[shipType] = { fillStyle: ctx.fillStyle, calls: JSON.stringify(ctx.calls) };
+    }
+    assert.notStrictEqual(drawn.slow.fillStyle, drawn.regular.fillStyle);
+    assert.notStrictEqual(drawn.slow.calls, drawn.regular.calls);
   });
 
   it('draws one rectangle per projectile', () => {
@@ -170,12 +174,15 @@ describe('Renderer.draw order (MOD-rendering; ARC-002 back-to-front)', () => {
     const fillRects = ctx.calls.filter((c) => c.method === 'fillRect');
     const background = fillRects[0];
     assert.deepStrictEqual(background.args, [0, 0, WIDTH, HEIGHT]);
-    const alienRects = fillRects.slice(1, -2);
+    const between = fillRects.slice(1, -1);
+    const firstShipRect = between.findIndex((c) => insideBox(c.args, state.ship));
+    const alienRects = between.slice(0, firstShipRect);
+    const shipRects = between.slice(firstShipRect);
     const alienBoxes = state.aliens;
     assert.ok(alienRects.length >= alienBoxes.length);
     assert.ok(alienRects.every((c) => alienBoxes.some((box) => insideBox(c.args, box))));
-    const shipRect = fillRects[fillRects.length - 2];
-    assert.deepStrictEqual(shipRect.args, [380, 560, 40, 30]);
+    assert.ok(shipRects.length > 0);
+    assert.ok(shipRects.every((c) => insideBox(c.args, state.ship)));
     const projectileRect = fillRects[fillRects.length - 1];
     assert.deepStrictEqual(projectileRect.args, [398, 500, 4, 10]);
     assert.strictEqual(ctx.calls[0].method, 'clearRect');
