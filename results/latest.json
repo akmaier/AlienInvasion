@@ -1,22 +1,22 @@
 {
   "workflow": "Agent M tests",
   "product": "akmaier/AlienInvasion",
-  "run_id": "44305930948",
+  "run_id": "44306390868",
   "run_attempt": "1",
-  "commit": "b8dbe7ad77f9b87cec2deddd93878adfd62d47a9",
+  "commit": "ccfd9d2caf0b78de2a27b72f123f81ac8d78b737",
   "ref": "refs/heads/main",
-  "ran_at": "2026-11-18T12:39:09.386Z",
+  "ran_at": "2026-11-18T12:42:02.520Z",
   "exit_code": 0,
   "summary": {
-    "suites": 20,
-    "tests": 141,
-    "passed": 141,
+    "suites": 21,
+    "tests": 142,
+    "passed": 142,
     "failed": 0
   },
   "runner": {
     "npm": {
-      "tests": "111",
-      "passed": "111",
+      "tests": "112",
+      "passed": "112",
       "failed": "0",
       "exit": 0
     },
@@ -28,9 +28,9 @@
   },
   "levels": {
     "subsystem": {
-      "files": 1,
-      "tests": 13,
-      "passed": 13,
+      "files": 2,
+      "tests": 14,
+      "passed": 14,
       "failed": 0
     },
     "system": {
@@ -89,9 +89,12 @@
     },
     {
       "name": "ALIEN PIXEL SHAPE",
-      "guarded_by": [],
+      "guarded_by": [
+        "tests/component/test_alien_pixel_shape.js",
+        "tests/unit/test_rendering.js"
+      ],
       "guarded_by_review": [],
-      "passing": false
+      "passing": true
     },
     {
       "name": "PLAYER SHIP SELECTION",
@@ -372,6 +375,17 @@
   ],
   "files": [
     {
+      "file": "tests/component/test_alien_pixel_shape.js",
+      "language": "javascript",
+      "level": "subsystem",
+      "tests": 1,
+      "passed": true,
+      "executable": true,
+      "guards": [
+        "ALIEN PIXEL SHAPE"
+      ]
+    },
+    {
       "file": "tests/component/test_game_loop.js",
       "language": "javascript",
       "level": "subsystem",
@@ -635,6 +649,7 @@
       "executable": true,
       "guards": [
         "IMPLEMENTATION JAVASCRIPT WEB",
+        "ALIEN PIXEL SHAPE",
         "PLAYER SHIP SELECTION",
         "PLAYER SHIP TYPE REGULAR",
         "SCORE DISPLAY",
