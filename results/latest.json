@@ -1,11 +1,11 @@
 {
   "workflow": "Agent M tests",
   "product": "akmaier/AlienInvasion",
-  "run_id": "44305721595",
+  "run_id": "44305930948",
   "run_attempt": "1",
-  "commit": "596d374b5836e665f85a8cde48b87f5b8116bc65",
+  "commit": "b8dbe7ad77f9b87cec2deddd93878adfd62d47a9",
   "ref": "refs/heads/main",
-  "ran_at": "2026-11-18T12:37:51.965Z",
+  "ran_at": "2026-11-18T12:39:09.386Z",
   "exit_code": 0,
   "summary": {
     "suites": 20,
@@ -86,6 +86,12 @@
       ],
       "guarded_by_review": [],
       "passing": true
+    },
+    {
+      "name": "ALIEN PIXEL SHAPE",
+      "guarded_by": [],
+      "guarded_by_review": [],
+      "passing": false
     },
     {
       "name": "PLAYER SHIP SELECTION",
