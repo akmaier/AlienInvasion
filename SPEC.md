@@ -28,6 +28,10 @@ The game shall present rows of alien invaders moving horizontally across the scr
 After reaching a screen edge, alien rows shall descend toward the player's ship.
 *Check:* `tests/integration/test_alien_movement.py::test_descend_after_edge` verifies that rows move downward after hitting an edge.
 
+**ALIEN PIXEL SHAPE** *(github.com/akmaier)*
+Each alien shall be drawn as a pixel‑art figure of an alien, built from equal square pixels that leave part of its bounding box empty.
+*Check:* `tests/component/test_alien_pixel_shape.js::draws every alien as a pixel figure` records the canvas calls with which the formation is drawn and verifies that each alien is drawn from equal square pixels inside its bounding box, that at least one pixel cell of the box stays empty, and that no call fills the whole box; that the figure shows an alien is checked at review.
+
 **PLAYER SHIP SELECTION** *(github.com/akmaier)*
 The game shall present a ship selection screen at the start of a new game session where the player chooses one of the available ship types.
 *Check:* `tests/integration/test_ship_selection.py::test_ship_selection_screen` verifies that a selection screen is shown before gameplay starts and that the player can choose a ship type.

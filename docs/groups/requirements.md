@@ -17,6 +17,7 @@ The hierarchy of the requirements, each member by its name.
   - PLAYER SHIP SLOW SPECIAL SHOT
   - WAVE FIRST
   - WAVE NEXT
+  - ALIEN PIXEL SHAPE
 - Scoring & Game State
   - GAME OVER CONDITION
   - SCORE DISPLAY
