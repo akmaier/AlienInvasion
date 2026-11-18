@@ -13,6 +13,7 @@ realises:
   - PLAYER SHIP SELECTION
   - PLAYER SHIP TYPE REGULAR
   - PLAYER SHIP TYPE SLOW
+  - ALIEN PIXEL SHAPE
   - UC-005
   - UC-006
   - UC-007
@@ -33,7 +34,7 @@ Draw the current `GameState` to an HTML `<canvas>` and manage DOM overlays for s
 
 ## Parts
 
-- `CanvasRenderer` — Draws ship, aliens, projectiles to canvas each frame. **Renders ship with type-appropriate visuals (regular vs slow).**
+- `CanvasRenderer` — Draws ship, aliens, projectiles to canvas each frame. **Renders ship with type-appropriate visuals (regular vs slow).** Draws each alien as a pixel-art invader of equal square pixels inside its bounding box.
 - `ScoreDisplay` — Updates a DOM element with the current score.
 - `GameOverScreen` — Shows/hides the game-over overlay with final score, highscore list (each entry's initials and score) and restart button; the button exists only while the overlay is shown.
 - `HighscoreOverlay` — Shows/hides the in-game highscore list overlay (triggered by 'H' key), each entry with its initials and score.
