@@ -1,11 +1,11 @@
 {
   "workflow": "Agent M tests",
   "product": "akmaier/AlienInvasion",
-  "run_id": "44313116890",
+  "run_id": "44313825954",
   "run_attempt": "1",
-  "commit": "90d0e10f4229bf6198354490861abeb857e266b8",
+  "commit": "17d1256f770cf11f7c43073fc509918794760469",
   "ref": "refs/heads/main",
-  "ran_at": "2026-11-18T13:23:02.832Z",
+  "ran_at": "2026-11-18T13:27:14.181Z",
   "exit_code": 0,
   "summary": {
     "suites": 21,
@@ -146,6 +146,18 @@
       ],
       "guarded_by_review": [],
       "passing": true
+    },
+    {
+      "name": "PLAYER SHIP REGULAR PIXEL SHAPE",
+      "guarded_by": [],
+      "guarded_by_review": [],
+      "passing": false
+    },
+    {
+      "name": "PLAYER SHIP SLOW PIXEL SHAPE",
+      "guarded_by": [],
+      "guarded_by_review": [],
+      "passing": false
     },
     {
       "name": "PLAYER MOVEMENT KEYS",
